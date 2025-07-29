@@ -1,4 +1,4 @@
-export function Início () {
+export function Inicio () {
     return (
         <div className="inicio-container">
             <h1>Início Page</h1>
