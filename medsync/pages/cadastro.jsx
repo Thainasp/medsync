@@ -1,3 +1,5 @@
+import './cadastro.css';
+
 export function Cadastro() {
     return (
         <div className="cadastro-container">
