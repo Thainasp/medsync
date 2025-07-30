@@ -11,15 +11,16 @@
   will-change: filter;
   transition: filter 300ms;
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+
+.nunitoFont {
+  font-family: "Nunito", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: weight;
+  font-style: normal;
 }
 
-.fontDefault {
-  font-family: "Nunito", sans-serif;
+.quicksandFont {
+  font-family: "Quicksand", sans-serif;
   font-optical-sizing: auto;
   font-weight: weight;
   font-style: normal;
