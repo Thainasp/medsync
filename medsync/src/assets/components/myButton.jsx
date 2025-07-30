@@ -8,9 +8,10 @@ const Button = styled.button`
   font-weight: 200;
   font-optical-sizing: auto;
   font-size: 16px;
-  width: 150px;
+  flex-direction: column;
+  width: 200px;
   height: 35px;
-  margin: 2.5em;
+  margin: 25px;
   padding: 0.25em 1em;
   border: 2px solid #2194CA;
   border-radius: 3px;
