@@ -1,9 +1,11 @@
 import { Footer } from "../components/footer/footer";
 import { TelaBase } from "../components/telaBase";
+import { Header } from "../components/header/header";
 export function Login() {
     return (
         <div className="login-container">
             <TelaBase>
+                <Header/>
                 <h1>Login Page</h1>
                 <form>
                     <div className="form-group">
