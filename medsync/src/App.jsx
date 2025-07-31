@@ -20,7 +20,7 @@ function App() {
           <Route path="/cadastro" element={<Cadastro />} />
           <Route path="/inicio" element={<Inicio/>}/>
           <Route path="/addMed" element={<AdicionarMed />} />
-          <Route path="/ditarMed" element={<EditarMedicamento />} />
+          <Route path="/editarMed" element={<EditarMedicamento />} />
           <Route path="/config" element={<Configurações/>}/>
           <Route path="/sobre" element={<Sobre/>}/>
         </Routes>
