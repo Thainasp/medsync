@@ -1,4 +1,3 @@
-import './cadastro.css';
 
 export function Cadastro() {
     return (

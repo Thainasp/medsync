@@ -1,6 +1,6 @@
-import { Footer } from "../components/footer/footer";
-import { TelaBase } from "../components/telaBase";
-import { Header } from "../components/header/header";
+import { Footer } from "src/components/footer";
+import { TelaBase } from "src/components/telaBase";
+import { Header } from "src/components/header";
 export function Login() {
     return (
         <div className="login-container">

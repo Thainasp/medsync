@@ -1,6 +1,6 @@
-import styled from 'styled-components'
+import styled from "styled-components";
 
-export const StyledFooter = styled.footer`
+const StyledFooter = styled.footer`
   background-color: #1a324e;
   color: white;
   text-align: center;
@@ -14,3 +14,7 @@ export const StyledFooter = styled.footer`
   align-items: center;
   justify-content: center;
 `;
+
+export function Footer() {
+  return <StyledFooter>Todos os direitos reservados</StyledFooter>;
+}

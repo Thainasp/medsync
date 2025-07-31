@@ -1,24 +1,19 @@
-import { MyButton } from '../src/assets/components/myButton';
+import { MyButton } from "src/components/myButton"
 import styled from 'styled-components';
-import background from '../src/assets/images/background.jpg';
-import logo from '../src/assets/images/logo.png';
-import { Footer } from '../components/footer/footer';
+import { Footer } from 'src/components/footer';
+import { Header } from "../components/header";
 
 export function Home() {
 
     const BackgroundDiv = styled.div`
-      background-image: url(${background});
+      background-image: url("./public/assets/image/background.jpg");
       width: 105%;
       height: 100vh;
       background-size: cover;      
       background-position: left;
     `;
 
-    const Logo = styled.img`
-      width: 450px;
-      height: 400px;
-      display: block;
-    `;
+
 
     const ButtonsDiv = styled.div`
       height: 250px;
@@ -34,11 +29,7 @@ export function Home() {
 
         <div className='home-container'>
             <BackgroundDiv>
-
-                <div>
-                    <Logo src={logo} alt="Logo Medsync" />
-                </div>
-
+                <Header/>
                 <ButtonsDiv>
                     <div>
                         <MyButton>Acessar</MyButton>
