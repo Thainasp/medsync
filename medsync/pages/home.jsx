@@ -2,12 +2,13 @@ import { MyButton } from '../src/assets/components/myButton';
 import styled from 'styled-components';
 import background from '../src/assets/images/background.jpg';
 import logo from '../src/assets/images/logo.png';
+import { Footer } from '../components/footer/footer';
 
 export function Home() {
 
     const BackgroundDiv = styled.div`
       background-image: url(${background});
-      width: 100%;
+      width: 105%;
       height: 100vh;
       background-size: cover;      
       background-position: left;
@@ -32,7 +33,6 @@ export function Home() {
     return (
 
         <div className='home-container'>
-
             <BackgroundDiv>
 
                 <div>
@@ -46,8 +46,9 @@ export function Home() {
                     </div>
                 </ButtonsDiv>
 
-            </BackgroundDiv>
+                <Footer/>
 
+            </BackgroundDiv>
         </div>
 
     );
