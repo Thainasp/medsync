@@ -6,7 +6,7 @@ import { Header } from "../components/header";
 export function Home() {
 
     const BackgroundDiv = styled.div`
-      background-image: url("./public/assets/image/background.jpg");
+      background-image: url("./public/assets/images/background.jpg");
       width: 105%;
       height: 100vh;
       background-size: cover;      
@@ -17,7 +17,7 @@ export function Home() {
 
     const ButtonsDiv = styled.div`
       height: 250px;
-      margin-top: 150px;
+      margin-top: 225px;
       padding: 0 20px;
       display: flex;
       align-items: center;
