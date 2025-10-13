@@ -33,9 +33,9 @@ const Button = styled.button`
   }
 `;
 
-export function MyButton({ children }) {
+export function MyButton({ children, ...props }) {
   return (
-    <Button $primary>
+    <Button $primary {...props}>
       {children}
     </Button>
   );
