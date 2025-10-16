@@ -2,10 +2,9 @@ import { MyButton } from "src/components/myButton"
 import styled from 'styled-components';
 import { Footer } from 'src/components/footer';
 import { Header } from "../components/header";
+import { useNavigate } from "react-router-dom";
 
-export function Home() {
-
-    const BackgroundDiv = styled.div`
+const BackgroundDiv = styled.div`
       background-image: url("./public/assets/images/background.jpg");
       width: 105%;
       height: 100vh;
@@ -13,9 +12,7 @@ export function Home() {
       background-position: left;
     `;
 
-
-
-    const ButtonsDiv = styled.div`
+const ButtonsDiv = styled.div`
       height: 250px;
       margin-top: 225px;
       padding: 0 20px;
@@ -25,19 +22,32 @@ export function Home() {
       justify-content: center;  
     `;
 
+export function Home() {
+
+    const navigateLogin = useNavigate();
+    const navigateCadastro = useNavigate();
+
+    const handleClickLogin = () => {
+        navigateLogin("/login");
+    }
+    const handleClickCadastro = () => {
+        navigateCadastro("/cadastro");
+    }
+
     return (
 
         <div className='home-container'>
             <BackgroundDiv>
-                <Header/>
+                <Header />
+
                 <ButtonsDiv>
                     <div>
-                        <MyButton>Acessar</MyButton>
-                        <MyButton>Criar conta</MyButton>
+                        <MyButton onClick={handleClickLogin}>Acessar</MyButton>
+                        <MyButton onClick={handleClickCadastro}>Criar conta</MyButton>
                     </div>
                 </ButtonsDiv>
 
-                <Footer/>
+                <Footer />
 
             </BackgroundDiv>
         </div>

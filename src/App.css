@@ -31,6 +31,18 @@ html, body {
   font-style: normal;
 }
 
+.login-container{
+  font-family: "Nunito", sans-serif;
+  font-weight: 150;
+  font-optical-sizing: auto;
+  font-size: 16px;
+}
+
+::placeholder {
+  text-align: center;
+  color: #676666;
+  opacity: 1; 
+}
 
 @keyframes logo-spin {
   from {
