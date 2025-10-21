@@ -9,7 +9,6 @@ import {
   FormContainer,
   Label,
   InputField,
-  ErrorMessage,
   Legend,
   FormGroup,
 } from "../components/forms";
@@ -22,26 +21,31 @@ const AdicionarMed = () => {
   const [qtdUso, setQtdUso] = useState(0);
   const [tipoUso, setTipoUso] = useState("");
   const [qtdDiasTratamento, setQtdDiasTratamento] = useState(0);
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-  };
+  const [alertaEstoque, setAlertaEstoque] = useState(false);
+  const [alertaMedicamento, setAlertaMedicamento] = useState(false);
+  const [alertaWhatsapp, setAlertaWhatsapp] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const formData = {
+      nomeMedicamento,
+      dosagem,
+      dataCompra,
+      frequencia,
+      qtdUso,
+      tipoUso,
+      qtdDiasTratamento,
+      alertaEstoque,
+      alertaMedicamento,
+      alertaWhatsapp,
+    };
     console.log("Medicamento salvo:", formData);
-    alert("Medicamento salvo com sucesso!");
   };
   return (
     <TelaBase>
       <QuadroFundo>
         <TextoImportante>Adicionar Medicamento</TextoImportante>
-
-        <FormContainer>
+        <FormContainer onSubmit={handleSubmit}>
           <FormGroup>
             <Label htmlFor="medicamento">Medicamento:</Label>
             <InputField
@@ -50,6 +54,8 @@ const AdicionarMed = () => {
               name="medicamento"
               required
               placeholder="Insira o medicamento"
+              value={nomeMedicamento}
+              onChange={(e) => setNomeMedicamento(e.target.value)}
             />
           </FormGroup>
           <FormGroup>
@@ -60,6 +66,8 @@ const AdicionarMed = () => {
               name="dosagem"
               required
               placeholder="Insira Quantidade Comprada"
+              value={dosagem}
+              onChange={(e) => setDosagem(e.target.value)}
             />
           </FormGroup>
           <FormGroup>
@@ -70,6 +78,8 @@ const AdicionarMed = () => {
               name="data-compra"
               required
               placeholder="Insira a data da compra"
+              value={dataCompra}
+              onChange={(e) => setDataCompra(e.target.value)}
             />
           </FormGroup>
           <FormGroup>
@@ -80,6 +90,8 @@ const AdicionarMed = () => {
               name="frequencia"
               required
               placeholder="Insira a frequencia"
+              value={frequencia}
+              onChange={(e) => setFrequencia(e.target.value)}
             />
           </FormGroup>
           <FormGroup>
@@ -90,6 +102,8 @@ const AdicionarMed = () => {
               name="quantidadeporUso"
               required
               placeholder="Insira a quantidade por uso"
+              value={qtdUso}
+              onChange={(e) => setQtdUso(e.target.value)}
             />
           </FormGroup>
           <div>
@@ -120,13 +134,21 @@ const AdicionarMed = () => {
                 name="qtdDiasTratamento"
                 id="qtdDiasTratamento"
                 placeholder="Dias de tratamento"
+                value={qtdDiasTratamento}
+                onChange={(e) => setQtdDiasTratamento(e.target.value)}
               />
             </FormGroup>
           )}
 
           <FormGroup>
             <label htmlFor="AlertaEstoque">
-              <input type="checkbox" id="AlertaEstoque" name="AlertaEstoque" />
+              <input
+                type="checkbox"
+                id="AlertaEstoque"
+                name="AlertaEstoque"
+                checked={alertaEstoque}
+                onChange={() => setAlertaEstoque(!alertaEstoque)}
+              />
               Deseja receber alerta de quando seu medicamento estiver acabando?
             </label>
           </FormGroup>
@@ -137,6 +159,8 @@ const AdicionarMed = () => {
                 type="checkbox"
                 id="AlertaMedicamento"
                 name="AlertaMedicamento"
+                checked={alertaMedicamento}
+                onChange={() => setAlertaMedicamento(!alertaMedicamento)}
               />
               Deseja receber alerta para tomar o medicamento?
             </label>
@@ -148,6 +172,8 @@ const AdicionarMed = () => {
                 type="checkbox"
                 id="AlertaWhatsapp"
                 name="AlertaWhatsapp"
+                checked={alertaWhatsapp}
+                onChange={() => setAlertaWhatsapp(!alertaWhatsapp)}
               />
               Deseja notificações via WhatsApp?
             </label>
