@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { Cadastro } from 'src/pages/cadastro'
+import { RecuperacaoSenha } from 'src/pages/recuperacaoSenha'
 import { Configurações } from 'src/pages/config'
 import { EditarMedicamento } from 'src/pages/editarMed'
 import { Home } from 'src/pages/home'
@@ -17,6 +18,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home/>} />
           <Route path="/login" element={<Login />} />
+          <Route path="/recuperacaoSenha" element={<RecuperacaoSenha />} />
           <Route path="/cadastro" element={<Cadastro />} />
           <Route path="/inicio" element={<Inicio/>}/>
           <Route path="/addMed" element={<AdicionarMed />} />
