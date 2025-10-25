@@ -1,10 +1,10 @@
 import styled from "styled-components";
 
 export const FormContainer = styled.form`
-  font-family: 'Nunito', sans-serif;
+  font-family: "Nunito", sans-serif;
   display: flex;
   flex-direction: column;
-  max-width: 400px;  
+  max-width: 400px;
   margin: 0 auto;
   padding: 1rem;
   margin-bottom: 0rem;
@@ -20,7 +20,6 @@ export const Title = styled.p`
 export const InputField = styled.input`
   width: 200px;
   height: 35px;
-  margin-left: 25px;
   box-sizing: border-box;
   margin-bottom: 0.7em;
   padding: 0.5rem;
@@ -31,11 +30,18 @@ export const InputField = styled.input`
   `;
 
 export const Label = styled.label`
-  font-family: 'Nunito', sans-serif;
+  font-family: "Nunito", sans-serif;
   font-weight: 20;
   margin-bottom: 0.5rem;
   font-weight: bold;
-  `;
+`;
+
+export const Legend = styled.legend`
+  font-family: "Nunito", sans-serif;
+  font-weight: 20;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+`;
 
 export const ErrorMessage = styled.p`
   color: red;
