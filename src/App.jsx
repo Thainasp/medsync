@@ -7,6 +7,8 @@ import { Login } from 'src/pages/login'
 import { AdicionarMed } from 'src/pages/addMed'
 import { Sobre } from 'src/pages/sobre'
 import { Inicio } from 'src/pages/inicio'
+import { Calendario } from 'src/pages/calendario'
+import { Calendar } from 'src/components/calendar'
 import './App.css'
 
 function App() {
@@ -19,6 +21,8 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/cadastro" element={<Cadastro />} />
           <Route path="/inicio" element={<Inicio/>}/>
+          <Route path="/calendario" element={<Calendario/>}/>
+          <Route path="/calendar" element={<Calendar/>}/>
           <Route path="/addMed" element={<AdicionarMed />} />
           <Route path="/editarMed" element={<EditarMedicamento />} />
           <Route path="/config" element={<Configurações/>}/>
