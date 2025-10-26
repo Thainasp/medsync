@@ -19,7 +19,9 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/recuperacaoSenha" element={<RecuperacaoSenha />} />
           <Route path="/cadastro" element={<Cadastro />} />
-          <Route path="/inicio" element={<Inicio />} />
+          <Route path="/inicio" element={<Inicio/>}/>
+          <Route path="/calendario" element={<Calendario/>}/>
+          <Route path="/calendar" element={<Calendar/>}/>
           <Route path="/addMed" element={<AdicionarMed />} />
           <Route path="/editarMed" element={<EditarMedicamento />} />
           <Route path="/config" element={<Configurações />} />
