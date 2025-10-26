@@ -5,7 +5,6 @@ import { Footer } from "src/components/footer";
 import { TelaBase } from "src/components/telaBase";
 import { Header } from "src/components/header";
 import { MyButton } from "../components/myButton";
-import { RecuperacaoSenha } from "./recuperacaoSenha";
 import { Link } from "react-router-dom";
 
 export function Login() {
