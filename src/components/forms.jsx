@@ -95,4 +95,12 @@ export const StyledDivLinks = styled.div`
   }
 `
 
+export const FormGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 5px;
+`;
+
 

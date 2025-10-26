@@ -7,6 +7,7 @@ import { Login } from "src/pages/login";
 import AdicionarMed from "src/pages/addMed";
 import { Sobre } from "src/pages/sobre";
 import { Inicio } from "src/pages/inicio";
+import { RecuperacaoSenha } from "src/pages/recuperacaoSenha";
 import "./App.css";
 
 function App() {
