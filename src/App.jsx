@@ -9,6 +9,9 @@ import { Sobre } from "src/pages/sobre";
 import { Inicio } from "src/pages/inicio";
 import { RecuperacaoSenha } from "src/pages/recuperacaoSenha";
 import "./App.css";
+import { Estoque } from "./pages/estoque";
+import { EditarEstoque } from "./pages/editarEstoque";
+import { AddMedEstoque } from "./pages/addMedEstoque";
 
 function App() {
   return (
@@ -26,6 +29,9 @@ function App() {
           <Route path="/editarMed" element={<EditarMedicamento />} />
           <Route path="/config" element={<Configurações />} />
           <Route path="/sobre" element={<Sobre />} />
+          <Route path="/estoque" element={<Estoque/>} />
+          <Route path="/editarEstoque" element={<EditarEstoque/>} />
+          <Route path="/addMedEstoque" element={<AddMedEstoque/>} />
         </Routes>
       </Router>
     </>
