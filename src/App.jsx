@@ -14,6 +14,9 @@ import { EditarEstoque } from "./pages/editarEstoque";
 import { AddMedEstoque } from "./pages/addMedEstoque";
 import { Calendario } from "./pages/calendario";
 import { Calendar } from "./components/calendar";
+import { AddReceita } from "./pages/addReceita";
+import { EditarReceita } from "./pages/editarReceita";
+import { Receitas } from "./pages/receitas";
 
 const medicamentoMock = {
   nomeMedicamento: "Dipirona",
@@ -47,6 +50,9 @@ function App() {
           <Route path="/estoque" element={<Estoque/>} />
           <Route path="/editarEstoque" element={<EditarEstoque/>} />
           <Route path="/addMedEstoque" element={<AddMedEstoque/>} />
+          <Route path="/addReceita" element={<AddReceita/>} />
+          <Route path="/editarReceita" element={<EditarReceita/>} />
+          <Route path="/receitas" element={<Receitas/>} />
         </Routes>
       </Router>
     </>
