@@ -333,6 +333,26 @@ export function Calendar({ variant = 'default' }) {
     });
   };
 
+
+const navigateDay = (direction) => {
+  setAnimationDirection(direction);
+  
+  setTimeout(() => {
+    setCurrentDate(prevDate => {
+      const newDate = new Date(prevDate);
+      if (direction === 'next') {
+        newDate.setDate(prevDate.getDate() + 1); 
+      } else {
+        newDate.setDate(prevDate.getDate() - 1);
+      }
+      return newDate;
+    });
+    
+    setShowMonthIndicator(true);
+    setTimeout(() => setShowMonthIndicator(false), 800);
+  }, 150);
+};
+
   const handleDayClick = (day, isPreviousMonth = false, isNextMonth = false) => {
     let selected;
     
@@ -469,6 +489,15 @@ export function Calendar({ variant = 'default' }) {
     );
   };
 
+  const isCurrentDay = () => {
+  const today = new Date();
+  return (
+    currentDate.getDate() === today.getDate() &&
+    currentDate.getMonth() === today.getMonth() &&
+    currentDate.getFullYear() === today.getFullYear()
+  );
+};
+
   const getNextMonthName = () => {
     const nextDate = new Date(currentDate);
     nextDate.setMonth(currentDate.getMonth() + 1);
@@ -569,8 +598,8 @@ const renderWeekDays = () => {
     return (
       <HeaderOnlyContainer>
         <NavigationButton 
-          onClick={() => navigateMonth('prev')}
-          title={`Mês anterior: ${getPrevMonthName()}`}
+          onClick={() => navigateDay('prev')}
+          title={`Dia anterior: ${formatDate(new Date(currentDate.getTime() - 24 * 60 * 60 * 1000))}`}
         >
           ‹
         </NavigationButton>
@@ -583,7 +612,7 @@ const renderWeekDays = () => {
             {formatDate(currentDate)}
           </FormattedDate>
           
-          {!isCurrentMonth() && (
+          {!isCurrentDay() && (
             <TodayButton onClick={goToToday}>
               Hoje
             </TodayButton>
@@ -591,8 +620,8 @@ const renderWeekDays = () => {
         </div>
         
         <NavigationButton 
-          onClick={() => navigateMonth('next')}
-          title={`Próximo mês: ${getNextMonthName()}`}
+          onClick={() => navigateDay('next')} 
+        title={`Próximo dia: ${formatDate(new Date(currentDate.getTime() + 24 * 60 * 60 * 1000))}`}
         >
           ›
         </NavigationButton>
