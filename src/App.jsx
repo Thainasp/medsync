@@ -8,15 +8,19 @@ import AdicionarMed from "src/pages/addMed";
 import { Sobre } from "src/pages/sobre";
 import { Inicio } from "src/pages/inicio";
 import { RecuperacaoSenha } from "src/pages/recuperacaoSenha";
+import { Teste } from "./pages/teste";
 import "./App.css";
 import { Estoque } from "./pages/estoque";
 import { EditarEstoque } from "./pages/editarEstoque";
 import { AddMedEstoque } from "./pages/addMedEstoque";
 import { Calendario } from "./pages/calendario";
 import { Calendar } from "./components/calendar";
+
 import { AddReceita } from "./pages/addReceita";
 import { EditarReceita } from "./pages/editarReceita";
 import { Receitas } from "./pages/receitas";
+
+import { MedicamentoProvider } from "./context/MedicamentoContext";
 
 const medicamentoMock = {
   nomeMedicamento: "Dipirona",
@@ -43,8 +47,8 @@ function App() {
           <Route path="/inicio" element={<Inicio/>}/>
           <Route path="/calendario" element={<Calendario/>}/>
           <Route path="/calendar" element={<Calendar/>}/>
-          <Route path="/addMed" element={<AdicionarMed />} />
-          <Route path="/editarMed" element={<AdicionarMed isEdit={true} medicamento={medicamentoMock} />} />
+          <Route path="/addMed" element={<MedicamentoProvider><AdicionarMed /></MedicamentoProvider>} />
+          <Route path="/editarMed" element={<MedicamentoProvider><AdicionarMed isEdit={true} medicamento={medicamentoMock} /></MedicamentoProvider>} />
           <Route path="/config" element={<Configurações />} />
           <Route path="/sobre" element={<Sobre />} />
           <Route path="/estoque" element={<Estoque/>} />

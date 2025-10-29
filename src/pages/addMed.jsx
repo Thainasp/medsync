@@ -4,6 +4,7 @@ import { QuadroFundo } from "../components/quadroFundo";
 import { TextoImportante } from "../components/TextoImportante";
 import { MyButton } from "../components/myButton";
 import { TelaBase } from "../components/telaBase";
+import { useMedicamentoContext } from "../context/MedicamentoContext";
 import {
   FormContainer,
   Label,
@@ -14,6 +15,8 @@ import {
 
 
 const AdicionarMed = ({isEdit=false, medicamento = {} }) => {
+  const { adicionarMedicamento, atualizarMedicamento } = useMedicamentoContext();
+
   const {
     nomeMedicamento: initNomeMedicamento = "",
     dosagem: initDosagem = 0,
@@ -54,7 +57,10 @@ const AdicionarMed = ({isEdit=false, medicamento = {} }) => {
       alertaMedicamento,
       alertaWhatsapp,
     };
-    console.log("Medicamento salvo:", formData);
+    const acao = isEdit ? atualizarMedicamento : adicionarMedicamento;
+    acao(formData).then((res) => {
+      console.log("Medicamento salvo com sucesso!", res);
+    });
     setSucessoEnviado(true);
     setTimeout(() => {
       setSucessoEnviado(false);
