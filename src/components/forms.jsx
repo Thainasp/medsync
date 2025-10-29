@@ -21,6 +21,7 @@ export const InputField = styled.input`
   width: 200px;
   height: 35px;
   box-sizing: border-box;
+  margin: 0 25px;
   margin-bottom: 0.7em;
   padding: 0.5rem;
   border: 1px solid #ccc;
