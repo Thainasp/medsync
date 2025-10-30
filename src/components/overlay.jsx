@@ -24,6 +24,10 @@ export const OverlayContainer = styled.div`
   text-align: center;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
   z-index: 1001;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
   `;
 
   export const OverlayTitle = styled.h2`
@@ -36,3 +40,7 @@ export const OverlayText = styled.p`
   margin-bottom: 25px;
 `;
 
+export const OverlayIcon = styled.img`
+  width: 60px;
+  height: 60px;
+`;

@@ -6,6 +6,12 @@ import { MyButton } from "../components/myButton";
 import { TelaBase } from "../components/telaBase";
 import { useMedicamentoContext } from "../context/MedicamentoContext";
 import {
+  OverlayContainer,
+  OverlayIcon,
+  OverlayTitle,
+  OverlayContent,
+} from "../components/overlay";
+import {
   FormContainer,
   Label,
   InputField,
@@ -13,9 +19,9 @@ import {
   FormGroup,
 } from "../components/forms";
 
-
-const AdicionarMed = ({isEdit=false, medicamento = {} }) => {
-  const { adicionarMedicamento, atualizarMedicamento } = useMedicamentoContext();
+const AdicionarMed = ({ isEdit = false, medicamento = {} }) => {
+  const { adicionarMedicamento, atualizarMedicamento } =
+    useMedicamentoContext();
 
   const {
     nomeMedicamento: initNomeMedicamento = "",
@@ -36,12 +42,15 @@ const AdicionarMed = ({isEdit=false, medicamento = {} }) => {
   const [frequencia, setFrequencia] = useState(initFrequencia);
   const [qtdUso, setQtdUso] = useState(initQtdUso);
   const [tipoUso, setTipoUso] = useState(initTipoUso);
-  const [qtdDiasTratamento, setQtdDiasTratamento] = useState(initQtdDiasTratamento);
+  const [qtdDiasTratamento, setQtdDiasTratamento] = useState(
+    initQtdDiasTratamento
+  );
   const [alertaEstoque, setAlertaEstoque] = useState(initAlertaEstoque);
-  const [alertaMedicamento, setAlertaMedicamento] = useState(initAlertaMedicamento);
+  const [alertaMedicamento, setAlertaMedicamento] = useState(
+    initAlertaMedicamento
+  );
   const [alertaWhatsapp, setAlertaWhatsapp] = useState(initAlertaWhatsapp);
   const [sucessoEnviado, setSucessoEnviado] = useState(false);
-
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -70,9 +79,18 @@ const AdicionarMed = ({isEdit=false, medicamento = {} }) => {
 
   return (
     <TelaBase>
-      {sucessoEnviado && <div>Medicamento salvo com sucesso!</div>}
+      {sucessoEnviado && (
+        <OverlayContainer>
+          <OverlayContent>
+            <OverlayIcon src="/assets/images/imgaalerta.svg" alt="Success" />
+            <OverlayTitle>Medicamento salvo com sucesso!</OverlayTitle>
+          </OverlayContent>
+        </OverlayContainer>
+      )}
       <QuadroFundo>
-        <TextoImportante>{isEdit ? "Editar medicamento" : "Adicionar medicamento"}</TextoImportante>
+        <TextoImportante>
+          {isEdit ? "Editar medicamento" : "Adicionar medicamento"}
+        </TextoImportante>
         <FormContainer onSubmit={handleSubmit}>
           <FormGroup>
             <Label htmlFor="medicamento">Medicamento:</Label>
