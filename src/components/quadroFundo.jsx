@@ -9,4 +9,5 @@ export const QuadroFundo = styled.div`
   margin: 0 12%;
   border-radius: 2%;
   display: flex;
+  margin-bottom: 50px;
 `;

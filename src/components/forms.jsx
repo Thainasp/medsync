@@ -21,6 +21,7 @@ export const InputField = styled.input`
   width: 200px;
   height: 35px;
   box-sizing: border-box;
+  margin: 0 25px;
   margin-bottom: 0.7em;
   padding: 0.5rem;
   border: 1px solid #ccc;
@@ -103,4 +104,15 @@ export const FormGroup = styled.div`
   margin-top: 5px;
 `;
 
-
+export const Select = styled.select`
+  width: 200px;
+  height: 35px;
+  box-sizing: border-box;
+  margin: 0 25px;
+  margin-bottom: 0.7em;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 7px;
+  box-shadow: rgba(0, 0, 0, 0.15) 0px 3px 3px 0px;
+  margin-bottom: 1.3rem;
+`;
