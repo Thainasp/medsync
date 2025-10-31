@@ -5,6 +5,8 @@ import { TextoImportante } from "../components/TextoImportante";
 import { MyButton } from "../components/myButton";
 import { TelaBase } from "../components/telaBase";
 import { useMedicamentoContext } from "../context/MedicamentoContext";
+import { Footer } from "../components/footer";
+import { Header } from "../components/header";
 import {
   OverlayContainer,
   OverlayIcon,
@@ -17,6 +19,7 @@ import {
   InputField,
   Legend,
   FormGroup,
+  Select,
 } from "../components/forms";
 
 const AdicionarMed = ({ isEdit = false, medicamento = {} }) => {
@@ -79,6 +82,7 @@ const AdicionarMed = ({ isEdit = false, medicamento = {} }) => {
 
   return (
     <TelaBase>
+      <Header></Header>
       {sucessoEnviado && (
         <OverlayContainer>
           <OverlayContent>
@@ -129,16 +133,18 @@ const AdicionarMed = ({ isEdit = false, medicamento = {} }) => {
             />
           </FormGroup>
           <FormGroup>
-            <Label htmlFor="frequencia">Frequencia(Em horas):</Label>
-            <InputField
-              type="number"
-              id="frequencia"
-              name="frequencia"
-              required
-              placeholder="Insira a frequencia"
+            <Label htmlFor="frequencia">Frequencia:</Label>
+            <Select id="myDropdown">
+              <option value="option">--</option>
+              <option value="option1">De 2 em 2 horas</option>
+              <option value="option2">De 4 em 4 horas</option>
+              <option value="option3">De 6 em 6 horas</option>
+              <option value="option4">De 8 em 8 horas</option>
+              <option value="option5">Uma vez ao dia</option>
+              <option value="option6">Uma vez na semana</option> 
               value={frequencia}
               onChange={(e) => setFrequencia(e.target.value)}
-            />
+            </Select>
           </FormGroup>
           <FormGroup>
             <Label htmlFor="quantidadeporUso">Quantidade por uso:</Label>
@@ -230,6 +236,7 @@ const AdicionarMed = ({ isEdit = false, medicamento = {} }) => {
           <MyButton type="submit">Salvar</MyButton>
         </FormContainer>
       </QuadroFundo>
+      <Footer />
     </TelaBase>
   );
 };
