@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import { TelaBase } from "../components/telaBase";
-import { TabelaEstoque } from '../components/tabelaEstoque';
+import { TabelaEstoque } from '../components/TabelaEstoque';
 import { MyButton } from '../components/myButton'; 
 import { Footer } from '../components/footer'; 
 import { TextoImportante } from "../components/TextoImportante";
