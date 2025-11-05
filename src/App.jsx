@@ -8,7 +8,6 @@ import AdicionarMed from "src/pages/addMed";
 import { Sobre } from "src/pages/sobre";
 import { Inicio } from "src/pages/inicio";
 import { RecuperacaoSenha } from "src/pages/recuperacaoSenha";
-import { Teste } from "./pages/teste";
 import "./App.css";
 
 function App() {
