@@ -1,29 +1,59 @@
 import React, { useState } from "react";
-
+import { useNavigate } from "react-router-dom";
 import { QuadroFundo } from "../components/quadroFundo";
 import { TextoImportante } from "../components/TextoImportante";
-import { TextoLongo } from "../components/TextoLongos";
 import { MyButton } from "../components/myButton";
 import { TelaBase } from "../components/telaBase";
+import { useMedicamentoContext } from "../context/MedicamentoContext";
+import { Footer } from "../components/footer";
+import { Header } from "../components/header";
+import {
+  OverlayContainer,
+  OverlayIcon,
+  OverlayTitle,
+  OverlayContent,
+} from "../components/overlay";
 import {
   FormContainer,
   Label,
   InputField,
   Legend,
   FormGroup,
+  Select,
 } from "../components/forms";
 
-const AdicionarMed = () => {
-  const [nomeMedicamento, setNomeMedicamento] = useState("");
-  const [dosagem, setDosagem] = useState(0);
-  const [dataCompra, setDataCompra] = useState("");
-  const [frequencia, setFrequencia] = useState("");
-  const [qtdUso, setQtdUso] = useState(0);
-  const [tipoUso, setTipoUso] = useState("");
-  const [qtdDiasTratamento, setQtdDiasTratamento] = useState(0);
-  const [alertaEstoque, setAlertaEstoque] = useState(false);
-  const [alertaMedicamento, setAlertaMedicamento] = useState(false);
-  const [alertaWhatsapp, setAlertaWhatsapp] = useState(false);
+const AdicionarMed = ({ isEdit = false, medicamento = {} }) => {
+  const { adicionarMedicamento, atualizarMedicamento } =
+    useMedicamentoContext();
+
+  const {
+    nomeMedicamento: initNomeMedicamento = "",
+    dosagem: initDosagem = 0,
+    dataCompra: initDataCompra = "",
+    frequencia: initFrequencia = "",
+    qtdUso: initQtdUso = 0,
+    tipoUso: initTipoUso = "",
+    qtdDiasTratamento: initQtdDiasTratamento = 0,
+    alertaEstoque: initAlertaEstoque = false,
+    alertaMedicamento: initAlertaMedicamento = false,
+    alertaWhatsapp: initAlertaWhatsapp = false,
+  } = medicamento;
+  const navigate = useNavigate();
+  const [nomeMedicamento, setNomeMedicamento] = useState(initNomeMedicamento);
+  const [dosagem, setDosagem] = useState(initDosagem);
+  const [dataCompra, setDataCompra] = useState(initDataCompra);
+  const [frequencia, setFrequencia] = useState(initFrequencia);
+  const [qtdUso, setQtdUso] = useState(initQtdUso);
+  const [tipoUso, setTipoUso] = useState(initTipoUso);
+  const [qtdDiasTratamento, setQtdDiasTratamento] = useState(
+    initQtdDiasTratamento
+  );
+  const [alertaEstoque, setAlertaEstoque] = useState(initAlertaEstoque);
+  const [alertaMedicamento, setAlertaMedicamento] = useState(
+    initAlertaMedicamento
+  );
+  const [alertaWhatsapp, setAlertaWhatsapp] = useState(initAlertaWhatsapp);
+  const [sucessoEnviado, setSucessoEnviado] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -39,12 +69,32 @@ const AdicionarMed = () => {
       alertaMedicamento,
       alertaWhatsapp,
     };
-    console.log("Medicamento salvo:", formData);
+    const acao = isEdit ? atualizarMedicamento : adicionarMedicamento;
+    acao(formData).then((res) => {
+      console.log("Medicamento salvo com sucesso!", res);
+    });
+    setSucessoEnviado(true);
+    setTimeout(() => {
+      setSucessoEnviado(false);
+      navigate("/inicio");
+    }, 5000);
   };
+
   return (
     <TelaBase>
+      <Header></Header>
+      {sucessoEnviado && (
+        <OverlayContainer>
+          <OverlayContent>
+            <OverlayIcon src="/assets/images/imgaalerta.svg" alt="Success" />
+            <OverlayTitle>Medicamento salvo com sucesso!</OverlayTitle>
+          </OverlayContent>
+        </OverlayContainer>
+      )}
       <QuadroFundo>
-        <TextoImportante>Adicionar Medicamento</TextoImportante>
+        <TextoImportante>
+          {isEdit ? "Editar medicamento" : "Adicionar medicamento"}
+        </TextoImportante>
         <FormContainer onSubmit={handleSubmit}>
           <FormGroup>
             <Label htmlFor="medicamento">Medicamento:</Label>
@@ -71,7 +121,7 @@ const AdicionarMed = () => {
             />
           </FormGroup>
           <FormGroup>
-            <Label htmlFor="dada-compra">Data da compra:</Label>
+            <Label htmlFor="data-compra">Data da compra:</Label>
             <InputField
               type="date"
               id="data-compra"
@@ -83,16 +133,18 @@ const AdicionarMed = () => {
             />
           </FormGroup>
           <FormGroup>
-            <Label htmlFor="frequencia">Frequencia(Em horas):</Label>
-            <InputField
-              type="number"
-              id="frequencia"
-              name="frequencia"
-              required
-              placeholder="Insira a frequencia"
+            <Label htmlFor="frequencia">Frequencia:</Label>
+            <Select id="myDropdown">
+              <option value="option">--</option>
+              <option value="option1">De 2 em 2 horas</option>
+              <option value="option2">De 4 em 4 horas</option>
+              <option value="option3">De 6 em 6 horas</option>
+              <option value="option4">De 8 em 8 horas</option>
+              <option value="option5">Uma vez ao dia</option>
+              <option value="option6">Uma vez na semana</option> 
               value={frequencia}
               onChange={(e) => setFrequencia(e.target.value)}
-            />
+            </Select>
           </FormGroup>
           <FormGroup>
             <Label htmlFor="quantidadeporUso">Quantidade por uso:</Label>
@@ -113,7 +165,8 @@ const AdicionarMed = () => {
               id="Continuo"
               name="uso"
               value="continuo"
-              onClick={(e) => setTipoUso(e.target.value)}
+              checked={tipoUso === "continuo"}
+              onChange={(e) => setTipoUso(e.target.value)}
             />
             <Label htmlFor="Continuo">Contínuo</Label>
             <input
@@ -121,9 +174,10 @@ const AdicionarMed = () => {
               id="Temporario"
               name="uso"
               value="temporario"
-              onClick={(e) => setTipoUso(e.target.value)}
+              checked={tipoUso === "temporario"}
+              onChange={(e) => setTipoUso(e.target.value)}
             />
-            <Label htmlFor="Eventual">Temporario</Label>
+            <Label htmlFor="Temporario">Temporario</Label>
           </div>
 
           {tipoUso === "temporario" && (
@@ -182,6 +236,7 @@ const AdicionarMed = () => {
           <MyButton type="submit">Salvar</MyButton>
         </FormContainer>
       </QuadroFundo>
+      <Footer />
     </TelaBase>
   );
 };

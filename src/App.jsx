@@ -7,8 +7,33 @@ import { Login } from "src/pages/login";
 import AdicionarMed from "src/pages/addMed";
 import { Sobre } from "src/pages/sobre";
 import { Inicio } from "src/pages/inicio";
+import { Calendario } from "src/pages/calendario";
 import { RecuperacaoSenha } from "src/pages/recuperacaoSenha";
 import "./App.css";
+import { Estoque } from "./pages/estoque";
+import { EditarEstoque } from "./pages/editarEstoque";
+import { AddMedEstoque } from "./pages/addMedEstoque";
+
+import { Calendar } from "./components/calendar";
+
+import { AddReceita } from "./pages/addReceita";
+import { EditarReceita } from "./pages/editarReceita";
+import { Receitas } from "./pages/receitas";
+
+import { MedicamentoProvider } from "./context/MedicamentoContext";
+
+const medicamentoMock = {
+  nomeMedicamento: "Dipirona",
+  dosagem: 500,
+  dataCompra: "2023-10-01",
+  frequencia: "3",
+  qtdUso: 1,
+  tipoUso: "temporario",
+  qtdDiasTratamento: 5,
+  alertaEstoque: true,
+  alertaMedicamento: true,
+  alertaWhatsapp: true,
+}
 
 function App() {
   return (
@@ -19,11 +44,19 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/recuperacaoSenha" element={<RecuperacaoSenha />} />
           <Route path="/cadastro" element={<Cadastro />} />
-          <Route path="/inicio" element={<Inicio />} />
-          <Route path="/addMed" element={<AdicionarMed />} />
-          <Route path="/editarMed" element={<EditarMedicamento />} />
+          <Route path="/inicio" element={<Inicio/>}/>
+          <Route path="/calendario" element={<Calendario/>}/>
+          <Route path="/calendar" element={<Calendar/>}/>
+          <Route path="/addMed" element={<MedicamentoProvider><AdicionarMed /></MedicamentoProvider>} />
+          <Route path="/editarMed" element={<MedicamentoProvider><AdicionarMed isEdit={true} medicamento={medicamentoMock} /></MedicamentoProvider>} />
           <Route path="/config" element={<Configurações />} />
           <Route path="/sobre" element={<Sobre />} />
+          <Route path="/estoque" element={<Estoque/>} />
+          <Route path="/editarEstoque" element={<EditarEstoque/>} />
+          <Route path="/addMedEstoque" element={<AddMedEstoque/>} />
+          <Route path="/addReceita" element={<AddReceita/>} />
+          <Route path="/editarReceita" element={<EditarReceita/>} />
+          <Route path="/receitas" element={<Receitas/>} />
         </Routes>
       </Router>
     </>
