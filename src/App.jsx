@@ -7,13 +7,14 @@ import { Login } from "src/pages/login";
 import AdicionarMed from "src/pages/addMed";
 import { Sobre } from "src/pages/sobre";
 import { Inicio } from "src/pages/inicio";
+import { Calendario } from "src/pages/calendario";
 import { RecuperacaoSenha } from "src/pages/recuperacaoSenha";
 
 import "./App.css";
 import { Estoque } from "./pages/estoque";
 import { EditarEstoque } from "./pages/editarEstoque";
 import { AddMedEstoque } from "./pages/addMedEstoque";
-import { Calendario } from "./pages/calendario";
+
 import { Calendar } from "./components/calendar";
 
 import { AddReceita } from "./pages/addReceita";

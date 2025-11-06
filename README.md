@@ -1,12 +1,93 @@
-# React + Vite
+# ⚕️ MedSync
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Thainasp / medsync
 
-Currently, two official plugins are available:
+O **MedSync** é um sistema de gerenciamento de saúde desenvolvido para auxiliar pessoas de diferentes faixas etárias, como idosos e jovens adultos com rotinas intensas, na organização de suas rotinas de cuidados diários [1-3]. O sistema visa promover maior autonomia e segurança, permitindo o acompanhamento de medicamentos, consultas e histórico médico [1].
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+O projeto foi desenvolvido por alunos do curso de **Tecnologia em Análise e Desenvolvimento de Sistemas** do Instituto Federal de São Paulo (**IFSP**), Câmpus Bragança Paulista, como avaliação parcial da disciplina de Análise Orientada a Objetos [4].
 
-## Expanding the ESLint configuration
+## 📚 Documentação Técnica
+Para uma análise aprofundada, detalhes de implementação, e o escopo completo do projeto, baixe o nosso documento oficial:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+* **[Documentação Técnica MedSync (PDF)](./Documentacao_Tecnica_Medsync.pdf)**
+
+## 🎯 Objetivo e Funcionalidades
+
+O objetivo central do MedSync é melhorar a disciplina terapêutica, reduzindo a dificuldade que muitos usuários enfrentam para seguir tratamentos complexos [2]. Para isso, o sistema oferece:
+
+### 💊 Gerenciamento e Alertas (Requisitos Essenciais e Importantes)
+
+*   **Alertas Personalizados:** Envio de notificações sonoras, visuais e por *push* (e-mail, WhatsApp) sobre o horário da medicação [1, 5, 6].
+*   **Confirmação de Uso (RF32):** O usuário deve confirmar que tomou a medicação [7]. O sistema registra o status como "Tomado", "Adiado" ou "Cancelado" no histórico [7, 8].
+*   **Gerenciamento de Medicamentos:** Cadastro detalhado de nome, dosagem, frequência e tipo de tratamento (contínuo ou temporário) [8].
+*   **Interações Medicamentosas (RF12):** O sistema deve alertar sobre interações ao inserir o medicamento, utilizando a **API Bulário Digital** [8-10].
+*   **Controle de Estoque (RF40):** Monitoramento do estoque de medicamentos para emitir aviso sobre a necessidade de compra quando o estoque for insuficiente para oito dias de tratamento [8, 11, 12].
+*   **Gerenciamento de Receitas (RF17):** Permite o *upload* opcional de receitas (PDF, JPG, PNG) e envia notificações próximas à data de vencimento (RF26) [8].
+*   **Exames (RF45):** Permite o *upload* e a exclusão de exames [8, 13].
+
+### 🔒 Segurança e Acessibilidade (Requisitos Não Funcionais)
+
+*   **Conformidade Legal:** Proteção de dados pessoais e clínicos seguindo a **LGPD (Lei Geral de Proteção de Dados)** (RNF09) [9, 14].
+*   **Segurança:** Autenticação por senha (RNF03) e *backups* automáticos diários dos dados dos usuários (RNF13) [9, 14].
+*   **Acessibilidade:** Interface intuitiva e acessível para diversas faixas etárias (RNF10), com suporte para leitores de tela, ajuste de fontes e alteração de padrão de cores (RNF11, RNF16) [5, 9].
+*   **Multiplataforma:** Acessível via navegador web e aplicativo móvel, com design responsivo (RNF12) [5, 9].
+
+## 💻 Arquitetura e Tecnologias
+
+O projeto segue uma **abordagem de desenvolvimento ágil** e utiliza um conjunto moderno de tecnologias [15].
+
+| Componente | Tecnologia | Detalhes |
+| :--- | :--- | :--- |
+| **Frontend (Web)** | **JavaScript** (98.3%), **React** [16-18] | Utiliza **Vite** para *tooling* e suporta **HMR** (Hot Module Replacement) e **ESLint** [16]. |
+| **Frontend (Mobile)** | **React Native** [18] | Para desenvolvimento de aplicações móveis nativas [18]. |
+| **Backend** | **Python** com **Django Framework** [10] | Para construção de APIs RESTful [10]. |
+| **Banco de Dados** | **MySQL** [9, 10] | Sistema de gerenciamento de banco de dados relacional (RNF06) [9, 10]. |
+| **APIs** | **Google Calendar API**, **API Bulário Digital** [9, 10] | Integração com agenda e verificação de interações medicamentosas [10]. |
+| **Qualidade/Testes** | **Jest** (Frontend), **Postman**, **Insomnia** (Backend) [9, 15] | Ferramentas de teste (RNF07) [9]. |
+| **Infraestrutura** | **Git** / **GitHub**, **Railway**, **Docker** [10, 15] | Controle de versão, hospedagem e conteinerização [10, 15]. |
+
+## 🚀 Começando (Setup Técnico)
+
+Este repositório (`Thainasp/medsync`) reflete a configuração inicial de um *template* que fornece o setup mínimo para o React funcionar no Vite [16].
+
+### Plugins Oficiais para Fast Refresh:
+
+*   `@vitejs/plugin-react`: utiliza **Babel** para Fast Refresh [16].
+*   `@vitejs/plugin-react-swc`: utiliza **SWC** para Fast Refresh [16].
+
+### Recomendação de Desenvolvimento:
+
+Se o desenvolvimento for para uma aplicação de produção, é recomendável expandir a configuração do ESLint e usar **TypeScript** com regras de *lint* habilitadas para tipos [16].
+
+### Estrutura de Arquivos (Parcial):
+
+O repositório inclui os seguintes diretórios e arquivos [19]:
+*   `public/ assets/ images/`
+*   `src/`
+*   `.gitignore`
+*   `README.md`
+*   `eslint.config.js`
+*   `index.html`
+*   `package-lock.json`
+*   `package.json`
+*   `vite.config.js`
+
+## 📊 Estatísticas do Repositório
+
+| Métrica | Valor | Fonte |
+| :--- | :--- | :--- |
+| **Estrelas** | **1** | [17, 19] |
+| **Forks** | **1** | [17, 19] |
+| **Contribuidores** | **3** | [17] |
+| **Commits** | **46** | [19] |
+| **Watchers** | **0** | [17] |
+| **Releases** | **0** (Nenhuma publicada) | [17] |
+| **Packages** | **0** (Nenhum publicado) | [17] |
+
+## 👥 Desenvolvedores
+
+O projeto MedSync foi desenvolvido por [4]:
+*   EDUARDO SCHOOF
+*   ISABELA DE MELO IZIDORIO
+*   MARIANE FÁTIMA SILVA
+*   THAINA DE SOUZA PEREIRA
