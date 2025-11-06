@@ -5,7 +5,79 @@ import styled, { css } from "styled-components";
 import { TelaBase } from "../components/telaBase";
 import { TextoImportante } from "../components/TextoImportante";
 import { QuadroFundo } from "../components/quadroFundo"; // O quadrado azul de fundo
-// import { MyButton } from "../components/myButton"; 
+
+// --- NOVO: Componentes de Overlay/Pop-up ---
+// Importando os componentes de Overlay/Pop-up que você forneceu
+export const OverlayContainer = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  background-color: rgba(0, 0, 0, 0.15);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  `;
+
+  export const OverlayContent = styled.div`
+  width: 90%;
+  margin: 0 35px 0 35px;
+  max-width: 350px;
+  padding: 35px;
+  border-radius: 8px;
+  background-color: #75A0D1;
+  color: #fff;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  z-index: 1001;
+  `;
+
+  export const OverlayTitle = styled.h2`
+  font-size: 20px;
+  margin-bottom: 10px;
+`;
+
+export const OverlayText = styled.p`
+  font-size: 16px;
+  margin-bottom: 25px;
+`;
+
+// Estilo para os botões dentro do Pop-up de confirmação
+const PopupButton = styled.button`
+    padding: 10px 20px;
+    margin: 0 8px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    min-width: 100px;
+    transition: background-color 0.2s;
+`;
+
+// Botão de Confirmação (Sim)
+const ConfirmButton = styled(PopupButton)`
+    background-color: #ecf0f1; /* Cinza claro */
+    color: #333;
+
+    &:hover {
+        background-color: #c0392b;
+        color: #ecf0f1;
+
+    }
+`;
+
+// Botão de Cancelar (Não)
+const CancelButton = styled(PopupButton)`
+    background-color: #ecf0f1; /* Cinza claro */
+    color: #333;
+
+    &:hover {
+        background-color: #bdc3c7;
+    }
+`;
 
 // --- Dados de Receita de Exemplo (Simulação) ---
 const receitasMock = [
@@ -95,9 +167,8 @@ const SearchInput = styled.input`
     }
 `;
 
-// --- 3. Componente de Item da Receita - REFATORADO (Adição dos Ícones de Ação) ---
+// --- 3. Componente de Item da Receita (MANTIDOS) ---
 
-// Componente para o ícone de seta (MANTIDO)
 const ArrowIcon = styled.span`
     display: inline-block;
     width: 0;
@@ -117,7 +188,7 @@ const ArrowIcon = styled.span`
 const RecipeHeader = styled.div`
     display: flex;
     justify-content: space-between;
-    align-items: flex-start; /* Ajustado para alinhar bem o texto e a barra de ações */
+    align-items: flex-start;
     padding: 10px 15px;
     cursor: pointer; 
     width: 100%;
@@ -165,16 +236,14 @@ const MedicationItem = styled.li`
     margin-top: 4px;
 `;
 
-// **NOVO CONTAINER PARA AGRUPAR OS ÍCONES DE AÇÃO**
 const ActionIconsContainer = styled.div`
     display: flex;
     align-items: flex-start;
-    gap: 8px; /* Espaço entre o lápis e a lixeira */
+    gap: 8px;
     flex-shrink: 0;
-    margin-top: 3px; /* Pequeno ajuste de alinhamento vertical */
+    margin-top: 3px;
 `;
 
-// **ESTILO COMUM PARA OS BOTÕES DE ÍCONE**
 const IconActionBase = styled.button`
     background: none;
     border: none;
@@ -188,17 +257,14 @@ const IconActionBase = styled.button`
     }
 `;
 
-// **Botão de Excluir (Agora usa IconActionBase)**
 const DeleteButton = styled(IconActionBase)`
-    color: #c0392b; /* Vermelho para exclusão */
+    color: #c0392b;
 `;
 
-// **Botão de Editar (NOVO)**
 const EditButton = styled(IconActionBase)`
-    color: #3498db; /* Azul para edição */
+    color: #3498db;
 `;
 
-// Ícone de Lixeira (MANTIDO)
 const TrashIconComponent = () => (
     <svg 
         xmlns="http://www.w3.org/2000/svg" 
@@ -210,7 +276,6 @@ const TrashIconComponent = () => (
     </svg>
 ); 
 
-// **Ícone de Lápis (NOVO COMPONENTE)**
 const PencilIconComponent = () => (
     <svg 
         xmlns="http://www.w3.org/2000/svg" 
@@ -229,14 +294,14 @@ const ItemReceita = ({ receita, onDelete, onEdit }) => {
         setIsExpanded(!isExpanded);
     };
 
+    // FUNÇÃO ATUALIZADA: Chama a função onDelete passada pelo pai
     const handleDeleteClick = (e) => {
         e.stopPropagation(); 
-        onDelete(receita.id);
+        onDelete(receita.id, receita.nome); // Passando o ID e o Nome para o pai
     };
     
-    // **NOVA FUNÇÃO DE CLIQUE PARA EDIÇÃO**
     const handleEditClick = (e) => {
-        e.stopPropagation(); // Impede que o clique no botão ative o toggle
+        e.stopPropagation();
         onEdit(receita.id);
     };
     
@@ -253,7 +318,6 @@ const ItemReceita = ({ receita, onDelete, onEdit }) => {
                     </RecipeInfo>
                 </RecipeDetails>
                 
-                {/* **Contêiner para os Ícones de Ação** */}
                 <ActionIconsContainer>
                     <EditButton 
                         onClick={handleEditClick} 
@@ -295,11 +359,15 @@ const ItemReceita = ({ receita, onDelete, onEdit }) => {
 };
 
 
-// --- 4. Componente Principal: Receitas - REFATORADO (passando onEdit) ---
+// --- 4. Componente Principal: Receitas - REFATORADO (com Pop-up) ---
 
 const Receitas = () => {
     const [receitas, setReceitas] = useState(receitasMock); 
     const [searchTerm, setSearchTerm] = useState(''); 
+    
+    // NOVO ESTADO: Controla a exibição do Pop-up e o ID da receita a ser excluída
+    const [showDeletePopup, setShowDeletePopup] = useState(false);
+    const [recipeToDelete, setRecipeToDelete] = useState(null); // {id: 'r1', nome: 'Receita dra maria'}
 
     const filteredReceitas = receitas.filter(receita => 
         receita.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -307,24 +375,34 @@ const Receitas = () => {
         receita.medicamentos.some(med => med.nome.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
-    const handleDeleteReceita = (id) => {
-        if (window.confirm("Tem certeza que deseja excluir esta receita?")) {
-            console.log(`Receita ID: ${id} excluída (SIMULAÇÃO API DELETE)`);
-           setReceitas(receitas.filter(r => r.id !== id));
-        }
+    // FUNÇÃO ATUALIZADA: Abre o pop-up de confirmação
+    const handleDeleteReceita = (id, nome) => {
+        // Remove window.confirm
+        setRecipeToDelete({ id, nome });
+        setShowDeletePopup(true);
     };
     
-    // **FUNÇÃO DE EDIÇÃO ATUALIZADA**
+    // NOVA FUNÇÃO: Executa a exclusão após a confirmação no Pop-up
+    const confirmDelete = () => {
+        if (recipeToDelete && recipeToDelete.id) {
+            console.log(`Receita ID: ${recipeToDelete.id} excluída (SIMULAÇÃO API DELETE)`);
+           setReceitas(receitas.filter(r => r.id !== recipeToDelete.id));
+        }
+        // Fecha o pop-up e limpa o estado
+        setShowDeletePopup(false);
+        setRecipeToDelete(null);
+    };
+    
+    // NOVA FUNÇÃO: Cancela a exclusão
+    const cancelDelete = () => {
+        // Apenas fecha o pop-up e limpa o estado
+        setShowDeletePopup(false);
+        setRecipeToDelete(null);
+    };
+    
     const handleEditReceita = (id) => {
-        // Simulação de navegação para a página de edição
         const editUrl = `/editarReceita/${id}`; 
         console.log(`[NAVIGATE] Redirecionando para: ${editUrl}`);
-        
-        // Se estivesse em um projeto real com React Router:
-        // navigate(editUrl); 
-        
-        // Simulação de redirecionamento:
-        // window.location.href = editUrl; 
     };
 
     return (
@@ -335,7 +413,7 @@ const Receitas = () => {
                     Receitas e medicamentos
                 </TextoImportante>
 
-                {/* Barra de Pesquisa */}
+                {/* Barra de Pesquisa (MANTIDA) */}
                 <SearchContainer>
                     <SearchInput
                         type="text"
@@ -345,15 +423,15 @@ const Receitas = () => {
                     />
                 </SearchContainer>
                 
-                {/* Lista de Receitas */}
+                {/* Lista de Receitas (MANTIDA) */}
                 <ListaContainer>
                     {filteredReceitas.length > 0 ? (
                         filteredReceitas.map(receita => (
                             <ItemReceita 
                                 key={receita.id}
                                 receita={receita}
-                                onDelete={handleDeleteReceita}
-                                // **Agora passando a função de edição para o ItemReceita**
+                                // Passando a função atualizada para abrir o Pop-up
+                                onDelete={handleDeleteReceita} 
                                 onEdit={handleEditReceita}
                             />
                         ))
@@ -365,6 +443,29 @@ const Receitas = () => {
                 </ListaContainer>
                 
             </PageContainer>
+            
+            {/* NOVO: Componente Pop-up de Confirmação */}
+            {showDeletePopup && recipeToDelete && (
+                <OverlayContainer>
+                    <OverlayContent>
+                        <OverlayTitle>
+                            Confirmação de Exclusão
+                        </OverlayTitle>
+                        <OverlayText>
+                            Tem certeza que deseja excluir a receita **"{recipeToDelete.nome}"**? Esta ação não pode ser desfeita.
+                        </OverlayText>
+                        <div>
+                            <ConfirmButton onClick={confirmDelete}>
+                                Excluir
+                            </ConfirmButton>
+                            <CancelButton onClick={cancelDelete}>
+                                Cancelar
+                            </CancelButton>
+                        </div>
+                    </OverlayContent>
+                </OverlayContainer>
+            )}
+            
         </TelaBase>
     );
 };
