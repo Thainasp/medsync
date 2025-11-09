@@ -1,9 +1,9 @@
 import { useForm } from "react-hook-form";
 
 import { FormContainer, Label, Title, InputField, ErrorMessage } from "../components/forms";
-import { Footer } from "src/components/footer";
-import { TelaBase } from "src/components/telaBase";
-import { Header } from "src/components/header";
+import { Footer } from "../components/footer";
+import { TelaBase } from "../components/telaBase";
+import { Header } from "../components/header";
 import { MyButton } from "../components/myButton";
 import { useNavigate } from "react-router-dom";
 

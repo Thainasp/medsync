@@ -1,8 +1,8 @@
 import { Header } from "../components/header";
 import styled from "styled-components";
-import { Calendar } from "src/components/calendar";
-import { Footer } from "src/components/footer";
-import { Menu } from "src/components/menu";
+import { Calendar } from "../components/calendar";
+import { Footer } from "../components/footer";
+import { Menu } from "../components/menu";
 import { useState } from "react";
 
 const WrapperCalendar = styled.section`
