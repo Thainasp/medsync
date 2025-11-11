@@ -1,27 +1,27 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { Cadastro } from "src/pages/cadastro";
-import { Configurações } from "src/pages/config";
-import { EditarMedicamento } from "src/pages/editarMed";
-import { Home } from "src/pages/home";
-import { Login } from "src/pages/login";
-import AdicionarMed from "src/pages/addMed";
-import { Sobre } from "src/pages/sobre";
-import { Inicio } from "src/pages/inicio";
-import { Calendario } from "src/pages/calendario";
-import { RecuperacaoSenha } from "src/pages/recuperacaoSenha";
 
 import "./App.css";
-import { Estoque } from "./pages/estoque";
-import { EditarEstoque } from "./pages/editarEstoque";
-import { AddMedEstoque } from "./pages/addMedEstoque";
+
+import { MedicamentoProvider } from "./context/MedicamentoContext";
 
 import { Calendar } from "./components/calendar";
 
+import { Home } from "./pages/home";
+import { Login } from "./pages/login";
+import { Cadastro } from "./pages/cadastro";
+import { RecuperacaoSenha } from "./pages/recuperacaoSenha";
+import { Inicio } from "./pages/inicio";
+import { Calendario } from "./pages/calendario";
+import { Configurações } from "./pages/config";
+import { Sobre } from "./pages/sobre";
+import AdicionarMed from "./pages/addMed";
+import { EditarMedicamento } from "./pages/editarMed";
+import { Estoque } from "./pages/estoque";
+import { EditarEstoque } from "./pages/editarEstoque";
+import { AddMedEstoque } from "./pages/addMedEstoque";
 import { AddReceita } from "./pages/addReceita";
 import { EditarReceita } from "./pages/editarReceita";
 import { Receitas } from "./pages/receitas";
-
-import { MedicamentoProvider } from "./context/MedicamentoContext";
 
 const medicamentoMock = {
   nomeMedicamento: "Dipirona",

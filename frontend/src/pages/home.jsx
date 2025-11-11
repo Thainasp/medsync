@@ -1,6 +1,6 @@
-import { MyButton } from "src/components/myButton"
+import { MyButton } from "../components/myButton"
 import styled from 'styled-components';
-import { Footer } from 'src/components/footer';
+import { Footer } from '../components/footer';
 import { Header } from "../components/header";
 import { useNavigate } from "react-router-dom";
 
