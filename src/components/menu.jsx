@@ -71,11 +71,11 @@ export function Menu({ isOpen, onClose, menuItems }) {
   const getRouteForMenuItem = (item) => {
     const routeMap = {
       "Calendário": "/calendario",
-      "Minhas receitas e medicamentos": "/medicamentos",
-      "Perfil": "/perfil",
+      "Minhas receitas e medicamentos": "/receitas",
+      "Perfil": "",
       "Estoque": "/estoque",
-      "Configurações": "/configuracoes",
-      "Sair": "/sair"
+      "Configurações": "",
+      "Sair": ""
     };
     return routeMap[item] || "/";
   };
