@@ -1,3 +1,5 @@
+
+import styled, { css } from "styled-components"; 
 import styled from "styled-components";
 
 export const OverlayContainer = styled.div`
@@ -11,15 +13,15 @@ export const OverlayContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  `;
+`;
 
-  export const OverlayContent = styled.div`
+export const OverlayContent = styled.div`
   width: 90%;
   margin: 0 35px 0 35px;
   max-width: 350px;
   padding: 35px;
   border-radius: 8px;
-  background-color: #75A0D1;
+  background-color: #75A0D1; 
   color: #fff;
   text-align: center;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
@@ -40,7 +42,54 @@ export const OverlayText = styled.p`
   margin-bottom: 25px;
 `;
 
-export const OverlayIcon = styled.img`
-  width: 60px;
-  height: 60px;
+export const PopupButton = styled.button`
+    padding: 10px 20px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    min-width: 100px;
+    transition: background-color 0.2s;
+    width: 100%;           
+    max-width: 200px;    
 `;
+
+export const ConfirmButton = styled(PopupButton)`
+    background-color: #ecf0f1; 
+    color: #333;
+
+    &:hover {
+        background-color: #c0392b; 
+        color: #ecf0f1;
+    }
+`;
+
+export const CancelButton = styled(PopupButton)`
+    background-color: #ecf0f1; 
+    color: #333;
+
+    &:hover {
+        background-color: #bdc3c7;
+    }
+`;
+
+export const OverlayIcon = styled.img`
+    width: 40px;
+    height: 40px;
+`;
+
+export const ModalWrapper = styled.div`
+  background: #75A0D1;
+  color: #fff;
+  width: 90%;
+  max-width: 500px;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  z-index: 1002;
+  position: relative; // Para o botão de fechar
+  max-height: 80vh; // Limita a altura
+  overflow-y: auto; // Permite scroll se o formulário for longo
+`; 
