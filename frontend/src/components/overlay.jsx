@@ -1,6 +1,5 @@
 
 import styled, { css } from "styled-components"; 
-import styled from "styled-components";
 
 export const OverlayContainer = styled.div`
   position: fixed;
@@ -27,7 +26,7 @@ export const OverlayContent = styled.div`
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
   z-index: 1001;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   `;
