@@ -24,7 +24,6 @@ import { EditarReceita } from "./pages/editarReceita";
 import { Receitas } from "./pages/receitas";
 
 
-import { MedicamentoProvider } from "./context/MedicamentoContext";
 
 const medicamentoMock = {
   nomeMedicamento: "Dipirona",
