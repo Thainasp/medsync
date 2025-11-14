@@ -116,3 +116,34 @@ export const Select = styled.select`
   box-shadow: rgba(0, 0, 0, 0.15) 0px 3px 3px 0px;
   margin-bottom: 1.3rem;
 `;
+
+export const DeleteButton = styled.button`
+  background-color: transparent;
+  color: #888; /* Cor cinza para ser discreto */
+  border: 1px solid #ccc;
+  padding: 10px 20px; /* O padding define o tamanho */
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: center;
+  transition: all 0.3s ease-in-out;
+  
+  width: auto; /* O botão terá o tamanho do seu conteúdo */
+  display: block; /* Necessário para centralizar com margem */
+  margin-top: 10px; /* Espaço acima */
+  margin-left: auto; /* Centraliza o botão */
+  margin-right: auto; /* Centraliza o botão */
+
+  &:hover {
+    background-color: #dc3545; /* Vermelho no hover */
+    color: #fff; /* Texto branco para contraste */
+    border-color: #dc3545;
+  }
+
+  &:disabled {
+    background-color: #e9ecef;
+    cursor: not-allowed;
+    color: #6c757d;
+  }
+`;
