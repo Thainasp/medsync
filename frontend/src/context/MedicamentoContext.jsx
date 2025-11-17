@@ -1,5 +1,5 @@
 import React, { createContext, useState } from "react";
-import { cadastrarMedicamento, editarMedicamento } from "./medicamentoapimock";
+
 
 export const useMedicamentoContext = () => {
   return React.useContext(MedicamentoContext);
