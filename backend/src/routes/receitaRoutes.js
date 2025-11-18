@@ -6,5 +6,6 @@ router.get("/", controller.listarReceitas);
 router.post("/", controller.criarReceita);
 router.get("/:id", controller.buscarReceita);
 router.delete("/:id", controller.deletarReceita);
+router.patch('/:id', controller.atualizarReceita);
 
 module.exports = router;
