@@ -1,5 +1,6 @@
-import React, { useState, useEffect }from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import styled from "styled-components";
+import debounce from "lodash.debounce";
 
 import {
   FormContainer,
@@ -8,14 +9,10 @@ import {
   Legend,
   FormGroup,
   Select,
-  ErrorMessage, 
+  ErrorMessage,
 } from "../components/forms";
 import { MyButton } from "../components/myButton";
 import { useMedicamentoContext } from "../context/MedicamentoContext";
-
-import {
-    CheckboxLabelGroup,
-} from "../components/addreceitastyles";
 
 import { OverlayContainer, ModalWrapper } from "../components/overlay";
 
@@ -42,9 +39,8 @@ const CloseButton = styled.button`
   }
 `;
 
-
-export const ModalAddMedicamento = ({ onClose, onMedicamentoSalvo, listaMedicamentosDisponiveis = [] }) => {
-  const { adicionarMedicamento } = useMedicamentoContext();
+export const ModalAddMedicamento = ({ onClose, onMedicamentoSalvo }) => {
+  const { medicamentos, buscaMedicamentos } = useMedicamentoContext();
 
   const [nomeMedicamento, setNomeMedicamento] = useState("");
   const [dosagem, setDosagem] = useState(0);
@@ -56,97 +52,127 @@ export const ModalAddMedicamento = ({ onClose, onMedicamentoSalvo, listaMedicame
   const [alertaEstoque, setAlertaEstoque] = useState(false);
   const [alertaMedicamento, setAlertaMedicamento] = useState(false);
   const [alertaWhatsapp, setAlertaWhatsapp] = useState(false);
-
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [filteredMedicamentos, setFilteredMedicamentos] = useState(
+    medicamentos || []
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [erros, setErros] = useState({}); 
+  const [erros, setErros] = useState({});
+  const wrapperRef = useRef(null);
 
-  // Lógica de Autocomplete/Preenchimento
+  useEffect(() => {
+    buscaMedicamentos();
+  }, []);
+
+  useEffect(() => {
+    setFilteredMedicamentos(medicamentos || []);
+  }, [medicamentos]);
+
+  const debouncedFilter = useMemo(
+    () =>
+      debounce((value) => {
+        const list = medicamentos || [];
+        const filtered = value
+          ? list.filter((m) => {
+              return m.nomeMedicamento
+                .toLowerCase()
+                .includes(value.toLowerCase());
+            })
+          : list;
+        setFilteredMedicamentos(filtered);
+      }, 300),
+    [medicamentos]
+  );
+
+  useEffect(() => {
+    return () => {
+      debouncedFilter.cancel && debouncedFilter.cancel();
+    };
+  }, [debouncedFilter]);
+
   const handleNomeChange = (e) => {
     const nome = e.target.value;
     setNomeMedicamento(nome);
-    setErros(prev => ({ ...prev, nomeMedicamento: "" }));
-    
-    const medExistente = listaMedicamentosDisponiveis.find(m => m.nome === nome);
-    
-    if (medExistente) {
-      // Preenche o formulário com dados existentes
-      setDosagem(medExistente.dosagem || 0);
-      setFrequencia(medExistente.frequencia || "");
-      setQtdUso(medExistente.qtdUso || 0);
-      setTipoUso(medExistente.tipoUso || "continuo"); 
-      setQtdDiasTratamento(medExistente.qtdDiasTratamento || 0);
-    } else {
-      // Limpa se for um nome novo
-      setDosagem(0);
-      setFrequencia("");
-      setQtdUso(0);
-      setTipoUso("continuo"); 
-      setQtdDiasTratamento(0);
-    }
+    setErros((prev) => ({ ...prev, nomeMedicamento: "" }));
+    setShowDropdown(true);
+    console.log("Input nomeMedicamento mudou para:", nome);
+    debouncedFilter(nome);
   };
 
+  const handleSelectMedicamento = (m) => {
+    setNomeMedicamento(m.nomeMedicamento);  
+    setShowDropdown(false);
+    setErros((prev) => ({ ...prev, nomeMedicamento: "" }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setErros({}); 
+    setErros({});
 
     const newErros = {};
     let isValid = true;
-    
+
     // 1. Validação: nomeMedicamento
     if (!nomeMedicamento.trim()) {
-        newErros.nomeMedicamento = "O nome do medicamento é obrigatório.";
-        isValid = false;
+      newErros.nomeMedicamento = "O nome do medicamento é obrigatório.";
+      isValid = false;
     }
 
     // 2. Validação: dosagem
     if (!dosagem || Number(dosagem) <= 0) {
-        newErros.dosagem = "A dosagem deve ser maior que zero (mg).";
-        isValid = false;
+      newErros.dosagem = "A dosagem deve ser maior que zero (mg).";
+      isValid = false;
     }
-    
+
     // 3. Validação: frequencia
     if (!frequencia) {
-        newErros.frequencia = "A frequência é obrigatória.";
-        isValid = false;
+      newErros.frequencia = "A frequência é obrigatória.";
+      isValid = false;
     }
 
     // 4. Validação: qtdUso (Quantidade por uso)
     if (!qtdUso || Number(qtdUso) <= 0) {
-        newErros.qtdUso = "A quantidade por uso deve ser maior que zero.";
-        isValid = false;
+      newErros.qtdUso = "A quantidade por uso deve ser maior que zero.";
+      isValid = false;
     }
-    
+
     // 5. Validação: qtdDiasTratamento (Se tipoUso for 'temporario')
-    if (tipoUso === "temporario" && (!qtdDiasTratamento || Number(qtdDiasTratamento) <= 0)) {
-        newErros.qtdDiasTratamento = "Para uso temporário, a quantidade de dias é obrigatória.";
-        isValid = false;
+    if (
+      tipoUso === "temporario" &&
+      (!qtdDiasTratamento || Number(qtdDiasTratamento) <= 0)
+    ) {
+      newErros.qtdDiasTratamento =
+        "Para uso temporário, a quantidade de dias é obrigatória.";
+      isValid = false;
     }
-    
+
     if (!isValid) {
-        setErros(newErros);
-        setIsSubmitting(false);
-        return; 
+      setErros(newErros);
+      setIsSubmitting(false);
+      return;
     }
 
     // Lógica de Submissão (Se for válido)
-    const medExistente = listaMedicamentosDisponiveis.find(m => m.nome === nomeMedicamento);
+    const medExistente = (medicamentos || []).find(
+      (m) => m.nome === nomeMedicamento
+    );
 
     if (medExistente) {
       const medData = {
-        ...medExistente, 
+        ...medExistente,
         dosagem: Number(dosagem),
         frequencia,
         qtdUso: Number(qtdUso),
         tipoUso,
-        qtdDiasTratamento: tipoUso === "temporario" ? Number(qtdDiasTratamento) : 0,
+        qtdDiasTratamento:
+          tipoUso === "temporario" ? Number(qtdDiasTratamento) : 0,
         alertaEstoque,
         alertaMedicamento,
         alertaWhatsapp,
       };
       onMedicamentoSalvo(medData);
-      onClose(); 
+      onClose();
     } else {
       const formData = {
         nomeMedicamento,
@@ -155,23 +181,24 @@ export const ModalAddMedicamento = ({ onClose, onMedicamentoSalvo, listaMedicame
         frequencia,
         qtdUso: Number(qtdUso),
         tipoUso,
-        qtdDiasTratamento: tipoUso === "temporario" ? Number(qtdDiasTratamento) : 0,
+        qtdDiasTratamento:
+          tipoUso === "temporario" ? Number(qtdDiasTratamento) : 0,
         alertaEstoque,
         alertaMedicamento,
         alertaWhatsapp,
       };
 
       try {
-        const res = await adicionarMedicamento(formData); 
-        
+        const res = await adicionarMedicamento(formData);
+
         const medicamentoSalvo = {
-            ...formData,
-            id: res.id || `m${Date.now()}`, 
-            nome: nomeMedicamento, 
+          ...formData,
+          id: res.id || `m${Date.now()}`,
+          nome: nomeMedicamento,
         };
 
-        onMedicamentoSalvo(medicamentoSalvo); 
-        onClose(); 
+        onMedicamentoSalvo(medicamentoSalvo);
+        onClose();
       } catch (error) {
         console.error("Erro ao salvar novo medicamento:", error);
         alert("Falha ao salvar o novo medicamento.");
@@ -189,28 +216,67 @@ export const ModalAddMedicamento = ({ onClose, onMedicamentoSalvo, listaMedicame
         </ModalHeader>
 
         <FormContainer onSubmit={handleSubmit}>
-          
           {/* CAMPO MEDICAMENTO */}
-          <FormGroup>
-            <Label htmlFor="medicamento">Medicamento:</Label>
+          <FormGroup style={{ position: "relative" }} ref={wrapperRef}>
+            <Label htmlFor="nomeMedicamento">Medicamento:</Label>
             <InputField
               type="text"
-              id="medicamento"
-              name="medicamento"
-              placeholder="Digite ou selecione um medicamento"
+              id="nomeMedicamento"
+              name="nomeMedicamento"
+              placeholder="Digite ou selecione..."
               value={nomeMedicamento}
+              autoComplete="off"
               onChange={handleNomeChange}
-              list="lista-medicamentos-disponiveis" 
+              onFocus={() => {
+                setShowDropdown(true);
+                debouncedFilter("");
+              }}
+              onBlur={() => {
+                setTimeout(() => setShowDropdown(false), 150);
+              }}
             />
-            {erros.nomeMedicamento && <ErrorMessage>{erros.nomeMedicamento}</ErrorMessage>}
-            
-            <datalist id="lista-medicamentos-disponiveis">
-                {listaMedicamentosDisponiveis.map((med) => (
-                    <option key={med.id} value={med.nome} />
-                ))}
-            </datalist>
-          </FormGroup>
 
+            {erros.nomeMedicamento && (
+              <ErrorMessage>{erros.nomeMedicamento}</ErrorMessage>
+            )}
+
+            {/* Dropdown de sugestões */}
+            {showDropdown &&
+              filteredMedicamentos &&
+              filteredMedicamentos.length > 0 && (
+                <div
+                  style={{
+                    position: "absolute",
+                    zIndex: 50,
+                    top: "calc(100% + 6px)",
+                    left: 0,
+                    right: 0,
+                    maxHeight: 180,
+                    overflowY: "auto",
+                    background: "#fff",
+                    border: "1px solid #ccc",
+                    borderRadius: 4,
+                    boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
+                    color: "#000",
+                  }}
+                >
+                  {filteredMedicamentos.map((m) => (
+                    <div
+                      key={m.id || m.nomeMedicamento}
+                      onMouseDown={(ev) => ev.preventDefault()} // evita perda de foco antes do click
+                      onClick={() => handleSelectMedicamento(m)}
+                      style={{
+                        padding: "8px 10px",
+                        cursor: "pointer",
+                        borderBottom: "1px solid #eee",
+                      }}
+                    >
+                      {m.nomeMedicamento}
+                    </div>
+                  ))}
+                </div>
+              )}
+          </FormGroup>
           {/* CAMPO DOSAGEM */}
           <FormGroup>
             <Label htmlFor="dosagem">Dosagem (mg):</Label>
@@ -222,7 +288,7 @@ export const ModalAddMedicamento = ({ onClose, onMedicamentoSalvo, listaMedicame
               value={dosagem}
               onChange={(e) => {
                 setDosagem(e.target.value);
-                setErros(prev => ({ ...prev, dosagem: "" }));
+                setErros((prev) => ({ ...prev, dosagem: "" }));
               }}
             />
             {erros.dosagem && <ErrorMessage>{erros.dosagem}</ErrorMessage>}
@@ -244,13 +310,13 @@ export const ModalAddMedicamento = ({ onClose, onMedicamentoSalvo, listaMedicame
           {/* CAMPO FREQUÊNCIA */}
           <FormGroup>
             <Label htmlFor="frequencia">Frequência:</Label>
-            <Select 
-                id="frequencia" 
-                value={frequencia}
-                onChange={(e) => {
-                    setFrequencia(e.target.value);
-                    setErros(prev => ({ ...prev, frequencia: "" }));
-                }}
+            <Select
+              id="frequencia"
+              value={frequencia}
+              onChange={(e) => {
+                setFrequencia(e.target.value);
+                setErros((prev) => ({ ...prev, frequencia: "" }));
+              }}
             >
               <option value="">--</option>
               <option value="option1">De 2 em 2 horas</option>
@@ -260,7 +326,9 @@ export const ModalAddMedicamento = ({ onClose, onMedicamentoSalvo, listaMedicame
               <option value="option5">Uma vez ao dia</option>
               <option value="option6">Uma vez na semana</option>
             </Select>
-            {erros.frequencia && <ErrorMessage>{erros.frequencia}</ErrorMessage>}
+            {erros.frequencia && (
+              <ErrorMessage>{erros.frequencia}</ErrorMessage>
+            )}
           </FormGroup>
 
           {/* CAMPO QUANTIDADE POR USO */}
@@ -274,7 +342,7 @@ export const ModalAddMedicamento = ({ onClose, onMedicamentoSalvo, listaMedicame
               value={qtdUso}
               onChange={(e) => {
                 setQtdUso(e.target.value);
-                setErros(prev => ({ ...prev, qtdUso: "" }));
+                setErros((prev) => ({ ...prev, qtdUso: "" }));
               }}
             />
             {erros.qtdUso && <ErrorMessage>{erros.qtdUso}</ErrorMessage>}
@@ -291,7 +359,7 @@ export const ModalAddMedicamento = ({ onClose, onMedicamentoSalvo, listaMedicame
               checked={tipoUso === "continuo"}
               onChange={(e) => {
                 setTipoUso(e.target.value);
-                setErros(prev => ({ ...prev, qtdDiasTratamento: "" })); 
+                setErros((prev) => ({ ...prev, qtdDiasTratamento: "" }));
               }}
             />
             <Label htmlFor="Continuo">Contínuo</Label>
@@ -320,11 +388,13 @@ export const ModalAddMedicamento = ({ onClose, onMedicamentoSalvo, listaMedicame
                 placeholder="Dias de tratamento"
                 value={qtdDiasTratamento}
                 onChange={(e) => {
-                    setQtdDiasTratamento(e.target.value);
-                    setErros(prev => ({ ...prev, qtdDiasTratamento: "" }));
+                  setQtdDiasTratamento(e.target.value);
+                  setErros((prev) => ({ ...prev, qtdDiasTratamento: "" }));
                 }}
               />
-              {erros.qtdDiasTratamento && <ErrorMessage>{erros.qtdDiasTratamento}</ErrorMessage>}
+              {erros.qtdDiasTratamento && (
+                <ErrorMessage>{erros.qtdDiasTratamento}</ErrorMessage>
+              )}
             </FormGroup>
           )}
 
@@ -369,11 +439,14 @@ export const ModalAddMedicamento = ({ onClose, onMedicamentoSalvo, listaMedicame
           </FormGroup>
 
           <FormGroup>
-          <MyButton type="submit" disabled={isSubmitting} style={{marginTop: "15px"}}>
-            {isSubmitting ? "Salvando..." : "Salvar e Adicionar"}
-          </MyButton>
+            <MyButton
+              type="submit"
+              disabled={isSubmitting}
+              style={{ marginTop: "15px" }}
+            >
+              {isSubmitting ? "Salvando..." : "Salvar e Adicionar"}
+            </MyButton>
           </FormGroup>
-
         </FormContainer>
       </ModalWrapper>
     </OverlayContainer>
