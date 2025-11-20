@@ -1,6 +1,8 @@
 const db = require("../db/database");
 
 exports.listarPrescricoes = (req, res) => {
+  
+
   const sql = `
     SELECT Prescricao.*, Medicamento.nome AS nomeMedicamento, Receita.nomeReceita
     FROM Prescricao
@@ -14,6 +16,7 @@ exports.listarPrescricoes = (req, res) => {
 };
 
 exports.criarPrescricao = (req, res) => {
+  console.log(req.body);
   const {
     frequencia,
     quantidade,

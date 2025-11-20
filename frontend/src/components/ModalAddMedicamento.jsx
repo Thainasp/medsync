@@ -157,6 +157,12 @@ export const ModalAddMedicamento = ({ onClose, onMedicamentoSalvo }) => {
         const medicamentoSalvo = {
           nome: nomeMedicamento,
           dosagem: Number(dosagem),
+          frequencia: Number(frequencia),
+          quantidade: Number(qtdUso),
+          data_inicio: "",
+          periodo : Number(qtdDiasTratamento),
+          consumido: false,
+          horario: new Date().toTimeString()
         };
         const validacaoMedicamento = onMedicamentoSalvo(medicamentoSalvo);
         if (validacaoMedicamento) {
@@ -282,12 +288,12 @@ export const ModalAddMedicamento = ({ onClose, onMedicamentoSalvo }) => {
               }}
             >
               <option value="">--</option>
-              <option value="option1">De 2 em 2 horas</option>
-              <option value="option2">De 4 em 4 horas</option>
-              <option value="option3">De 6 em 6 horas</option>
-              <option value="option4">De 8 em 8 horas</option>
-              <option value="option5">Uma vez ao dia</option>
-              <option value="option6">Uma vez na semana</option>
+              <option value="1">De 2 em 2 horas</option>
+              <option value="2">De 4 em 4 horas</option>
+              <option value="3">De 6 em 6 horas</option>
+              <option value="4">De 8 em 8 horas</option>
+              <option value="5">Uma vez ao dia</option>
+              <option value="6">Uma vez na semana</option>
             </Select>
             {erros.frequencia && (
               <ErrorMessage>{erros.frequencia}</ErrorMessage>

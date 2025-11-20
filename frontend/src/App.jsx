@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.css";
 
 import { MedicamentoProvider } from "./context/MedicamentoContext";
+import { ReceitaProvider } from "./context/ReceitaContext";
+import { PrescricaoETratamentoProvider } from "./context/PrescricaoETratamentoContext";
 
 import { Calendar } from "./components/calendar";
 
@@ -22,7 +24,6 @@ import { AddMedEstoque } from "./pages/addMedEstoque";
 import { AddReceita } from "./pages/addReceita";
 import { EditarReceita } from "./pages/editarReceita";
 import { Receitas } from "./pages/receitas";
-import { ReceitaProvider } from "./context/ReceitaContext";
 
 const medicamentoMock = {
   nomeMedicamento: "Dipirona",
@@ -42,39 +43,44 @@ function App() {
     <>
       <Router>
         <ReceitaProvider>
-          <MedicamentoProvider>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/recuperacaoSenha" element={<RecuperacaoSenha />} />
-              <Route path="/cadastro" element={<Cadastro />} />
-              <Route path="/sobre" element={<Sobre />} />
+          <PrescricaoETratamentoProvider>
+            <MedicamentoProvider>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/login" element={<Login />} />
+                <Route
+                  path="/recuperacaoSenha"
+                  element={<RecuperacaoSenha />}
+                />
+                <Route path="/cadastro" element={<Cadastro />} />
+                <Route path="/sobre" element={<Sobre />} />
 
-              <Route path="/inicio" element={<Inicio />} />
-              <Route path="/calendario" element={<Calendario />} />
-              <Route path="/calendar" element={<Calendar />} />
+                <Route path="/inicio" element={<Inicio />} />
+                <Route path="/calendario" element={<Calendario />} />
+                <Route path="/calendar" element={<Calendar />} />
 
-              <Route path="/addMed" element={<AdicionarMed />} />
-              <Route
-                path="/editarMed"
-                element={
-                  <EditarMedicamento
-                    isEdit={true}
-                    medicamento={medicamentoMock}
-                  />
-                }
-              />
+                <Route path="/addMed" element={<AdicionarMed />} />
+                <Route
+                  path="/editarMed"
+                  element={
+                    <EditarMedicamento
+                      isEdit={true}
+                      medicamento={medicamentoMock}
+                    />
+                  }
+                />
 
-              <Route path="/config" element={<Configurações />} />
-              <Route path="/estoque" element={<Estoque />} />
-              <Route path="/editarEstoque" element={<EditarEstoque />} />
-              <Route path="/addMedEstoque" element={<AddMedEstoque />} />
+                <Route path="/config" element={<Configurações />} />
+                <Route path="/estoque" element={<Estoque />} />
+                <Route path="/editarEstoque" element={<EditarEstoque />} />
+                <Route path="/addMedEstoque" element={<AddMedEstoque />} />
 
-              <Route path="/addReceita" element={<AddReceita />} />
-              <Route path="/editarReceita" element={<EditarReceita />} />
-              <Route path="/receitas" element={<Receitas />} />
-            </Routes>
-          </MedicamentoProvider>
+                <Route path="/addReceita" element={<AddReceita />} />
+                <Route path="/editarReceita" element={<EditarReceita />} />
+                <Route path="/receitas" element={<Receitas />} />
+              </Routes>
+            </MedicamentoProvider>
+          </PrescricaoETratamentoProvider>
         </ReceitaProvider>
       </Router>
     </>

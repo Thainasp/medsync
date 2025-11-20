@@ -13,15 +13,15 @@ exports.listarReceitas = (req, res) => {
 };
 
 exports.criarReceita = (req, res) => {
-  const { nomeReceita, data_emissao, Paciente_idPaciente, observacoes } =
+  const { nomeReceita, dataReceita, Paciente_idPaciente, observacoes } =
     req.body;
   db.run(
     `INSERT INTO Receita (nomeReceita, data_emissao, Paciente_idPaciente, observacoes)
      VALUES (?, ?, ?, ?)`,
-    [nomeReceita, data_emissao, Paciente_idPaciente, observacoes],
+    [nomeReceita, dataReceita, Paciente_idPaciente, observacoes],
     function (err) {
       if (err) res.status(500).json({ erro: err.message });
-      else res.status(201).json({ id: this.lastID, nomeReceita, data_emissao });
+      else res.status(201).json({ id: this.lastID, nomeReceita, dataReceita });
     }
   );
 };

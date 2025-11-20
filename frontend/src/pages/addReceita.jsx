@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { data, useNavigate } from "react-router-dom";
 import styled, { css } from "styled-components";
 
 import { QuadroFundo } from "../components/quadroFundo";
@@ -34,11 +34,13 @@ import {
 import { ModalAddMedicamento } from "../components/ModalAddMedicamento";
 import { useMedicamentoContext } from "../context/MedicamentoContext";
 import { useReceitaContext } from "../context/ReceitaContext";
+import { usePrescricaoETratamentoContext } from "../context/PrescricaoETratamentoContext";
 
 const AddReceita = ({ isEdit = false, receita = {} }) => {
   const { salvarReceita } = useReceitaContext();
   const { salvarMedicamento, medicamentosReceita } = useMedicamentoContext();
 
+  const { salvarPrescricao } = usePrescricaoETratamentoContext();
   const navigate = useNavigate();
 
   // Dados Iniciais da Receita
@@ -159,10 +161,10 @@ const AddReceita = ({ isEdit = false, receita = {} }) => {
       setIsSubmitting(false);
       return;
     }
-
     // Se válido, prepara os dados e salva
     const formData = {
       nomeReceita,
+      Paciente_idPaciente: 1, // pessoa responsavel pelo paciente add id
       dataReceita,
       observacoes,
       medicamentosReceita,
@@ -171,20 +173,35 @@ const AddReceita = ({ isEdit = false, receita = {} }) => {
     };
 
     try {
+      const medicamentosComId = [];
       if (medicamentosReceita.length > 0) {
-        await Promise.all(
-          medicamentosReceita.map((med) => salvarMedicamento(med))
-        );
+        medicamentosReceita.forEach(async (med) => {
+          const medBanco = await salvarMedicamento(med);
+          const medComId = { ...med, idMedicamento: medBanco.id };
+          medicamentosComId.push(medComId);
+        });
       }
 
-      await salvarReceita(formData);
+      const receita = await salvarReceita(formData);
+
+      medicamentosComId.forEach(async (med) => {
+        const prescricaoData = {
+          Receita_idReceita: receita.id,
+          Medicamento_idMedicamento: med.idMedicamento,
+          frequencia: med.frequencia,
+          quantidade: med.quantidade,
+          data_inicio: med.data_inicio,
+        };
+        console.log(prescricaoData);
+        await salvarPrescricao(prescricaoData);
+      });
 
       console.log("Receita salva com sucesso!", formData);
-      setSucessoEnviado(true);
+      /* setSucessoEnviado(true);
       setTimeout(() => {
         setSucessoEnviado(false);
         navigate("/receitas");
-      }, 3000);
+      }, 3000); */
     } catch (error) {
       console.error("Erro ao salvar a receita:", error);
       alert("Erro ao salvar a receita. Tente novamente.");
