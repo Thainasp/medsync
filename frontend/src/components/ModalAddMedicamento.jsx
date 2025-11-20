@@ -40,7 +40,7 @@ const CloseButton = styled.button`
 `;
 
 export const ModalAddMedicamento = ({ onClose, onMedicamentoSalvo }) => {
-  const { medicamentos, buscaMedicamentos } = useMedicamentoContext();
+  const { medicamentos, buscaMedicamentos, addMedicamentoReceita } = useMedicamentoContext();
 
   const [nomeMedicamento, setNomeMedicamento] = useState("");
   const [dosagem, setDosagem] = useState(0);
@@ -153,58 +153,21 @@ export const ModalAddMedicamento = ({ onClose, onMedicamentoSalvo }) => {
       return;
     }
 
-    // Lógica de Submissão (Se for válido)
-    const medExistente = (medicamentos || []).find(
-      (m) => m.nome === nomeMedicamento
-    );
-
-    if (medExistente) {
-      const medData = {
-        ...medExistente,
-        dosagem: Number(dosagem),
-        frequencia,
-        qtdUso: Number(qtdUso),
-        tipoUso,
-        qtdDiasTratamento:
-          tipoUso === "temporario" ? Number(qtdDiasTratamento) : 0,
-        alertaEstoque,
-        alertaMedicamento,
-        alertaWhatsapp,
-      };
-      onMedicamentoSalvo(medData);
-      onClose();
-    } else {
-      const formData = {
-        nomeMedicamento,
-        dosagem: Number(dosagem),
-        dataCompra,
-        frequencia,
-        qtdUso: Number(qtdUso),
-        tipoUso,
-        qtdDiasTratamento:
-          tipoUso === "temporario" ? Number(qtdDiasTratamento) : 0,
-        alertaEstoque,
-        alertaMedicamento,
-        alertaWhatsapp,
-      };
-
       try {
-        const res = await adicionarMedicamento(formData);
-
         const medicamentoSalvo = {
-          ...formData,
-          id: res.id || `m${Date.now()}`,
           nome: nomeMedicamento,
+          dosagem: Number(dosagem),
         };
-
-        onMedicamentoSalvo(medicamentoSalvo);
+        const validacaoMedicamento = onMedicamentoSalvo(medicamentoSalvo);
+        if (validacaoMedicamento) {
+          addMedicamentoReceita(medicamentoSalvo);
+        }
         onClose();
       } catch (error) {
         console.error("Erro ao salvar novo medicamento:", error);
         alert("Falha ao salvar o novo medicamento.");
         setIsSubmitting(false);
       }
-    }
   };
 
   return (

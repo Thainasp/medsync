@@ -34,45 +34,6 @@ import {
 import { ModalAddMedicamento } from "../components/ModalAddMedicamento";
 import { useMedicamentoContext } from "../context/MedicamentoContext";
 
-// Simulação (MOCK) ---
-
-const mockMedicamentosIniciais = [
-  {
-    id: "m1",
-    nome: "Lamotrigina 5mg",
-    dosagem: 5,
-    frequencia: "option4",
-    qtdUso: 1,
-    tipoUso: "continuo",
-  },
-  {
-    id: "m2",
-    nome: "Ansitec 5mg",
-    dosagem: 5,
-    frequencia: "option3",
-    qtdUso: 1,
-    tipoUso: "temporario",
-    qtdDiasTratamento: 7,
-  },
-  {
-    id: "m3",
-    nome: "Paracetamol 500mg",
-    dosagem: 500,
-    frequencia: "option2",
-    qtdUso: 1,
-    tipoUso: "temporario",
-    qtdDiasTratamento: 3,
-  },
-  {
-    id: "m4",
-    nome: "Amoxicilina 250mg",
-    dosagem: 250,
-    frequencia: "option4",
-    qtdUso: 2,
-    tipoUso: "temporario",
-    qtdDiasTratamento: 5,
-  },
-];
 
 const useReceitaContext = () => {
   const adicionarReceita = async (data) => {
@@ -89,7 +50,7 @@ const useReceitaContext = () => {
 
 const AddReceita = ({ isEdit = false, receita = {} }) => {
   const { adicionarReceita, atualizarReceita } = useReceitaContext();
-  const { adicionarMedicamento: adicionarMedContext } = useMedicamentoContext();
+  const { adicionarMedicamento: adicionarMedContext, medicamentosReceita } = useMedicamentoContext();
 
   const navigate = useNavigate();
 
@@ -110,10 +71,6 @@ const AddReceita = ({ isEdit = false, receita = {} }) => {
   const [alertaVencimento, setAlertaVencimento] =
     useState(initAlertaVencimento);
   const [notificacaoMed, setNotificacaoMed] = useState(initNotificacaoMed);
-  const [medicamentosReceita, setMedicamentosReceita] = useState(
-    initMedicamentosReceita
-  );
-
   const [erros, setErros] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -125,8 +82,6 @@ const AddReceita = ({ isEdit = false, receita = {} }) => {
   const [medToDelete, setMedToDelete] = useState(null);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [listaMedicamentosDisponiveis, setListaMedicamentosDisponiveis] =
-    useState(mockMedicamentosIniciais);
 
   // Efeito para carregar dados iniciais em modo edição
   useEffect(() => {
@@ -141,18 +96,12 @@ const AddReceita = ({ isEdit = false, receita = {} }) => {
   }, [isEdit, receita]);
 
   const handleMedicamentoSalvo = (medicamentoSalvo) => {
-    const isNewInMasterList = !listaMedicamentosDisponiveis.some(
-      (m) => m.id === medicamentoSalvo.id
-    );
-    if (isNewInMasterList) {
-      setListaMedicamentosDisponiveis([
-        ...listaMedicamentosDisponiveis,
-        medicamentoSalvo,
-      ]);
-    }
+    
 
     const isDuplicateInRecipe = medicamentosReceita.some(
-      (med) => med.id === medicamentoSalvo.id
+      (med) => {
+        return med.nome === medicamentoSalvo.nome
+      }
     );
     if (isDuplicateInRecipe) {
       alert("Este medicamento já foi adicionado à receita.");
@@ -160,32 +109,11 @@ const AddReceita = ({ isEdit = false, receita = {} }) => {
       return;
     }
 
-    setMedicamentosReceita((prevMeds) => {
-      // Limpa o erro de medicamento se a lista estava vazia
-      if (prevMeds.length === 0 && erros.medicamentos) {
-        setErros((prev) => ({ ...prev, medicamentos: "" }));
-      }
-      return [
-        ...prevMeds,
-        {
-          id: medicamentoSalvo.id,
-          nome: medicamentoSalvo.nome,
-          dosagem: medicamentoSalvo.dosagem,
-          frequencia: medicamentoSalvo.frequencia,
-          qtdUso: medicamentoSalvo.qtdUso,
-          tipoUso: medicamentoSalvo.tipoUso,
-          qtdDiasTratamento: medicamentoSalvo.qtdDiasTratamento || 0,
-          alertaEstoque: medicamentoSalvo.alertaEstoque,
-          alertaMedicamento: medicamentoSalvo.alertaMedicamento,
-          alertaWhatsapp: medicamentoSalvo.alertaWhatsapp,
-        },
-      ];
-    });
-
     setSucessoAdicionado(true);
     setTimeout(() => setSucessoAdicionado(false), 2500);
 
     setIsModalOpen(false);
+    return true;
   };
 
   // Abre o pop-up de confirmação de exclusão

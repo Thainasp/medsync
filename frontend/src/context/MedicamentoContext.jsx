@@ -18,6 +18,12 @@ const MedicamentoContext = createContext();
 export const MedicamentoProvider = ({ children }) => {
   const [medicamentos, setMedicamentos] = useState([]);
 
+  const [medicamentosReceita, setMedicamentosReceita] = useState([]);
+
+  const addMedicamentoReceita = (medicamento) => {
+    setMedicamentosReceita([...medicamentosReceita, medicamento]);
+  };
+
   const buscaMedicamentos = async() => {   
     const dados = await listarMedicamentos();
     if (dados) {
@@ -26,7 +32,7 @@ export const MedicamentoProvider = ({ children }) => {
   };
     return (   
     <MedicamentoContext.Provider
-      value={{ medicamentos, buscaMedicamentos }}
+      value={{ medicamentos, buscaMedicamentos, medicamentosReceita, addMedicamentoReceita }}
     >
         {children}
     </MedicamentoContext.Provider>

@@ -37,7 +37,7 @@ db.serialize(() => {
 
   db.run(`
     CREATE TABLE IF NOT EXISTS Medicamento (
-      idMedicamento INTEGER PRIMARY KEY,
+      idMedicamento INTEGER PRIMARY KEY AUTOINCREMENT,
       nome TEXT NOT NULL,
       dosagem REAL NOT NULL
     );
