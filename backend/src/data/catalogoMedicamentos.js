@@ -1,6 +1,6 @@
 // backend/src/data/medicines.js
 
-const catalogoMedicamentos = [
+module.exports = [
   {
     "id": 1,
     "NOME_MEDICAMENTO": "(VITAMINAS A )  +  ASSSOCIACÕES"
@@ -76431,4 +76431,3 @@ const catalogoMedicamentos = [
   }
 ];
 
-module.exports = catalogoMedicamentos;
