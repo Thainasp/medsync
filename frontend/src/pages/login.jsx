@@ -1,21 +1,47 @@
 import { useForm } from "react-hook-form";
+import { useNavigate, Link } from "react-router-dom";
 
 import { FormContainer, Label, Title, InputField, StyledDivLinks, ErrorMessage } from "../components/forms";
 import { Footer } from "src/components/footer";
 import { TelaBase } from "src/components/telaBase";
 import { Header } from "src/components/header";
 import { MyButton } from "../components/myButton";
-import { Link } from "react-router-dom";
 
 export function Login() {
   const { register, handleSubmit, setError, formState: { errors, isSubmitting } } = useForm();
+  const navigate = useNavigate(); 
 
   const onSubmit = async (data) => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log(data); // substituir para mandar para o backend
+      // CORREÇÃO: Rota ajustada para /pacientes/login
+      const response = await fetch('http://localhost:3001/pacientes/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: data.email,
+            senha: data.senha
+          })
+      });
+
+      const responseData = await response.json();
+
+      if (!response.ok) {
+          throw new Error(responseData.erro || "Falha ao entrar");
+      }
+
+      // SALVANDO O TOKEN E DADOS DO USUÁRIO
+      localStorage.setItem('token', responseData.token);
+      localStorage.setItem('usuarioNome', responseData.nome);
+      localStorage.setItem('usuarioId', responseData.id);
+
+      // Redireciona para a tela inicial protegida
+      navigate("/inicio"); 
+
     } catch (error) {
-      setError("email", { message: "E-mail não encontrado. Verifique e tente novamente ", error });
+      console.error(error);
+      // Define erro nos campos para feedback visual
+      setError("email", { message: "E-mail ou senha incorretos." });
+      setError("senha", { message: "Verifique suas credenciais." });
     }
   }
 
@@ -42,14 +68,14 @@ export function Login() {
             type="password"
             {...register("senha", {
               required: "Senha é obrigatória"
-            })} placeholder="Insira sua senha" /> {errors.senha && <ErrorMessage>{errors.senha.message}</ErrorMessage>}
+            })} placeholder="Insira sua senha" /> 
+            {errors.senha && <ErrorMessage>{errors.senha.message}</ErrorMessage>}
 
           <MyButton disabled={isSubmitting} type="submit">{isSubmitting ? "Acessando..." : "Entrar"}</MyButton>
 
         </FormContainer>
         <StyledDivLinks >
           <Link to="/recuperacaoSenha">Esqueceu a senha?  Clique aqui!</Link>
-
           <Link to={"/cadastro"}>Novo por aqui? Cadastre-se</Link>
         </StyledDivLinks>
 
