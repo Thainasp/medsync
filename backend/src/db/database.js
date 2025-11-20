@@ -36,6 +36,31 @@ db.serialize(() => {
   `);
 
   db.run(`
+    -- Tenta adicionar as novas colunas
+    ALTER TABLE Receita ADD COLUMN data_vencimento DATE;
+`, (err) => {
+    if (err && !err.message.includes("Coluna duplicada")) {
+      console.error("Erro ao adicionar coluna data_vencimento:", err.message);
+    }
+  });
+
+  db.run(`
+    ALTER TABLE Receita ADD COLUMN alerta_vencimento BOOLEAN; 
+`, (err) => {
+    if (err && !err.message.includes("Coluna duplicada")) {
+      console.error("Erro ao adicionar coluna alerta_vencimento:", err.message);
+    }
+  });
+
+  db.run(`
+    ALTER TABLE Receita ADD COLUMN notificacao_med BOOLEAN;
+`, (err) => {
+    if (err && !err.message.includes("Coluna duplicada")) {
+      console.error("Erro ao adicionar coluna notificacao_med:", err.message);
+    }
+  });
+
+  db.run(`
     CREATE TABLE IF NOT EXISTS Medicamento (
       idMedicamento INTEGER PRIMARY KEY,
       nome TEXT NOT NULL,
