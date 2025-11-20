@@ -9,6 +9,16 @@ const listarMedicamentos = async () => {
   });
   return response.json();
 }
+const salvarMedicamentoAPI = async (medicamento) => {
+  const response = await fetch("http://localhost:3001/medicamentos/criar", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(medicamento),
+  });
+  return response.json();
+}
 
 export const useMedicamentoContext = () => {
   return React.useContext(MedicamentoContext);
@@ -30,9 +40,14 @@ export const MedicamentoProvider = ({ children }) => {
       setMedicamentos(dados);
     }
   };
+  const salvarMedicamento = async (medicamento) => {
+    const novoMedicamento = await salvarMedicamentoAPI(medicamento);
+    return novoMedicamento;
+  };
+
     return (   
     <MedicamentoContext.Provider
-      value={{ medicamentos, buscaMedicamentos, medicamentosReceita, addMedicamentoReceita }}
+      value={{ medicamentos, buscaMedicamentos, medicamentosReceita, addMedicamentoReceita, salvarMedicamento }}
     >
         {children}
     </MedicamentoContext.Provider>

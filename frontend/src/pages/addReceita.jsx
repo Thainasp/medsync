@@ -33,24 +33,11 @@ import {
 
 import { ModalAddMedicamento } from "../components/ModalAddMedicamento";
 import { useMedicamentoContext } from "../context/MedicamentoContext";
-
-
-const useReceitaContext = () => {
-  const adicionarReceita = async (data) => {
-    console.log("Receita adicionada (MOCK):", data);
-    return { success: true, id: Date.now() };
-  };
-  const atualizarReceita = async (data) => {
-    console.log("Receita atualizada (MOCK):", data);
-    return { success: true };
-  };
-  return { adicionarReceita, atualizarReceita };
-};
-// ----------------------------------------------------------------
+import { useReceitaContext } from "../context/ReceitaContext";
 
 const AddReceita = ({ isEdit = false, receita = {} }) => {
-  const { adicionarReceita, atualizarReceita } = useReceitaContext();
-  const { adicionarMedicamento: adicionarMedContext, medicamentosReceita } = useMedicamentoContext();
+  const { salvarReceita } = useReceitaContext();
+  const { salvarMedicamento, medicamentosReceita } = useMedicamentoContext();
 
   const navigate = useNavigate();
 
@@ -96,13 +83,9 @@ const AddReceita = ({ isEdit = false, receita = {} }) => {
   }, [isEdit, receita]);
 
   const handleMedicamentoSalvo = (medicamentoSalvo) => {
-    
-
-    const isDuplicateInRecipe = medicamentosReceita.some(
-      (med) => {
-        return med.nome === medicamentoSalvo.nome
-      }
-    );
+    const isDuplicateInRecipe = medicamentosReceita.some((med) => {
+      return med.nome === medicamentoSalvo.nome;
+    });
     if (isDuplicateInRecipe) {
       alert("Este medicamento já foi adicionado à receita.");
       setIsModalOpen(false);
@@ -148,7 +131,7 @@ const AddReceita = ({ isEdit = false, receita = {} }) => {
   };
 
   //  Submissão Manual e Validação ---
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
@@ -187,23 +170,27 @@ const AddReceita = ({ isEdit = false, receita = {} }) => {
       notificacaoMed,
     };
 
-    const acao = isEdit ? atualizarReceita : adicionarReceita;
+    try {
+      if (medicamentosReceita.length > 0) {
+        await Promise.all(
+          medicamentosReceita.map((med) => salvarMedicamento(med))
+        );
+      }
 
-    acao(formData)
-      .then((res) => {
-        console.log("Receita salva com sucesso!", res);
-        setSucessoEnviado(true);
-        setTimeout(() => {
-          setSucessoEnviado(false);
-          navigate("/receitas");
-        }, 3000);
-      })
-      .catch((error) => {
-        console.error("Erro ao salvar a receita:", error);
-      })
-      .finally(() => {
-        setIsSubmitting(false);
-      });
+      await salvarReceita(formData);
+
+      console.log("Receita salva com sucesso!", formData);
+      setSucessoEnviado(true);
+      setTimeout(() => {
+        setSucessoEnviado(false);
+        navigate("/receitas");
+      }, 3000);
+    } catch (error) {
+      console.error("Erro ao salvar a receita:", error);
+      alert("Erro ao salvar a receita. Tente novamente.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Função auxiliar para formatar o nome do medicamento
