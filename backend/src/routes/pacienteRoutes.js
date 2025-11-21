@@ -7,6 +7,8 @@ const authMiddleware = require("../middleware/authMiddleware");
 router.post("/login", pacienteController.login);
 router.post("/cadastro", pacienteController.criarPaciente);
 
+router.post("/recuperar-senha", pacienteController.recuperarSenha);
+
 // 🔹 Rotas PRIVADAS (Precisam de token e protegem os dados)
 router.get("/", authMiddleware, pacienteController.listarPacientes);
 router.get("/:id", authMiddleware, pacienteController.buscarPaciente);
