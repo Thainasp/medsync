@@ -6,6 +6,8 @@ import { MedicamentoProvider } from "./context/MedicamentoContext";
 import { ReceitaProvider } from "./context/ReceitaContext";
 import { PrescricaoETratamentoProvider } from "./context/PrescricaoETratamentoContext";
 
+import { PrivateRoute } from "./components/PrivateRoute";
+
 import { Calendar } from "./components/calendar";
 
 import { Home } from "./pages/home";
@@ -46,38 +48,91 @@ function App() {
           <PrescricaoETratamentoProvider>
             <MedicamentoProvider>
               <Routes>
+                {/* === ROTAS PÚBLICAS (Qualquer um acessa) === */}
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
-                <Route
-                  path="/recuperacaoSenha"
-                  element={<RecuperacaoSenha />}
-                />
+                <Route path="/recuperacaoSenha" element={<RecuperacaoSenha />} />
                 <Route path="/cadastro" element={<Cadastro />} />
                 <Route path="/sobre" element={<Sobre />} />
 
-                <Route path="/inicio" element={<Inicio />} />
-                <Route path="/calendario" element={<Calendario />} />
-                <Route path="/calendar" element={<Calendar />} />
+                {/* === ROTAS PRIVADAS (Só acessa com Login) === */}
+                {/* Note que embrulhamos o element com <PrivateRoute> */}
 
-                <Route path="/addMed" element={<AdicionarMed />} />
-                <Route
-                  path="/editarMed"
-                  element={
+                <Route path="/inicio" element={
+                  <PrivateRoute>
+                    <Inicio />
+                  </PrivateRoute>
+                } />
+
+                <Route path="/calendario" element={
+                  <PrivateRoute>
+                    <Calendario />
+                  </PrivateRoute>
+                } />
+                
+                <Route path="/calendar" element={
+                  <PrivateRoute>
+                    <Calendar />
+                  </PrivateRoute>
+                } />
+
+                <Route path="/addMed" element={
+                  <PrivateRoute>
+                    <AdicionarMed />
+                  </PrivateRoute>
+                } />
+                
+                <Route path="/editarMed" element={
+                  <PrivateRoute>
                     <EditarMedicamento
                       isEdit={true}
                       medicamento={medicamentoMock}
                     />
-                  }
-                />
+                  </PrivateRoute>
+                } />
 
-                <Route path="/config" element={<Configurações />} />
-                <Route path="/estoque" element={<Estoque />} />
-                <Route path="/editarEstoque" element={<EditarEstoque />} />
-                <Route path="/addMedEstoque" element={<AddMedEstoque />} />
+                <Route path="/config" element={
+                  <PrivateRoute>
+                    <Configurações />
+                  </PrivateRoute>
+                } />
+                
+                <Route path="/estoque" element={
+                  <PrivateRoute>
+                    <Estoque />
+                  </PrivateRoute>
+                } />
+                
+                <Route path="/editarEstoque" element={
+                  <PrivateRoute>
+                    <EditarEstoque />
+                  </PrivateRoute>
+                } />
+                
+                <Route path="/addMedEstoque" element={
+                  <PrivateRoute>
+                    <AddMedEstoque />
+                  </PrivateRoute>
+                } />
 
-                <Route path="/addReceita" element={<AddReceita />} />
-                <Route path="/editarReceita" element={<EditarReceita />} />
-                <Route path="/receitas" element={<Receitas />} />
+                <Route path="/addReceita" element={
+                  <PrivateRoute>
+                    <AddReceita />
+                  </PrivateRoute>
+                } />
+                
+                <Route path="/editarReceita" element={
+                  <PrivateRoute>
+                    <EditarReceita />
+                  </PrivateRoute>
+                } />
+                
+                <Route path="/receitas" element={
+                  <PrivateRoute>
+                    <Receitas />
+                  </PrivateRoute>
+                } />
+                
               </Routes>
             </MedicamentoProvider>
           </PrescricaoETratamentoProvider>
