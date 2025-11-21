@@ -1,39 +1,43 @@
 const db = require("../db/database");
 
 exports.listarPrescricoes = (req, res) => {
+  const idUsuario = req.userId;
+
+  // Lógica: Traz a prescrição SE a Receita dela pertencer ao Paciente logado
   const sql = `
     SELECT Prescricao.*, Medicamento.nome AS nomeMedicamento, Receita.nomeReceita
     FROM Prescricao
-    INNER JOIN Medicamento ON Prescricao.Medicamento_idMedicamento = Medicamento.idMedicamento
     INNER JOIN Receita ON Prescricao.Receita_idReceita = Receita.idReceita
+    INNER JOIN Medicamento ON Prescricao.Medicamento_idMedicamento = Medicamento.idMedicamento
+    WHERE Receita.Paciente_idPaciente = ?
   `;
-  db.all(sql, [], (err, rows) => {
+
+  db.all(sql, [idUsuario], (err, rows) => {
     if (err) res.status(500).json({ erro: err.message });
     else res.json(rows);
   });
 };
 
 exports.criarPrescricao = (req, res) => {
-  const {
-    frequencia,
-    quantidade,
-    observacoes,
-    Medicamento_idMedicamento,
-    Receita_idReceita,
-  } = req.body;
-  db.run(
-    `INSERT INTO Prescricao (frequencia, quantidade, observacoes, Medicamento_idMedicamento, Receita_idReceita)
-     VALUES (?, ?, ?, ?, ?)`,
-    [
-      frequencia,
-      quantidade,
-      observacoes,
-      Medicamento_idMedicamento,
-      Receita_idReceita,
-    ],
-    function (err) {
-      if (err) res.status(500).json({ erro: err.message });
-      else res.status(201).json({ id: this.lastID });
-    }
-  );
+  const { frequencia, quantidade, observacoes, Medicamento_idMedicamento, Receita_idReceita } = req.body;
+  const idUsuario = req.userId;
+
+  // Validação de segurança: Antes de criar, verificamos se a Receita informada pertence ao usuário
+  db.get("SELECT idReceita FROM Receita WHERE idReceita = ? AND Paciente_idPaciente = ?", 
+    [Receita_idReceita, idUsuario], 
+    (err, row) => {
+      if (err) return res.status(500).json({ erro: err.message });
+      if (!row) return res.status(403).json({ erro: "Você não pode adicionar prescrições em receitas de outros usuários." });
+
+      // Se passou na validação, cria a prescrição
+      db.run(
+        `INSERT INTO Prescricao (frequencia, quantidade, observacoes, Medicamento_idMedicamento, Receita_idReceita)
+         VALUES (?, ?, ?, ?, ?)`,
+        [frequencia, quantidade, observacoes, Medicamento_idMedicamento, Receita_idReceita],
+        function (err) {
+          if (err) res.status(500).json({ erro: err.message });
+          else res.status(201).json({ id: this.lastID });
+        }
+      );
+  });
 };

@@ -27,5 +27,3 @@ lerna-debug.log*
 *.sln
 *.sw?
 
-# Banco de dados
-*.db
