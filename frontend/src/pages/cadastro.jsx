@@ -1,3 +1,4 @@
+import React, { useState } from "react"; // Adicionado useState
 import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
 
@@ -7,9 +8,20 @@ import { TelaBase } from "src/components/telaBase";
 import { Header } from "src/components/header";
 import { MyButton } from "../components/myButton";
 
+// IMPORTS DO OVERLAY
+import {
+    OverlayContainer,
+    OverlayContent,
+    OverlayIcon,
+    OverlayTitle,
+} from "../components/overlay";
+
 export function Cadastro() {
     const { register, watch, handleSubmit, setError, formState: { errors, isSubmitting } } = useForm();
     const navigate = useNavigate(); 
+
+    // Estado para controlar o pop-up de sucesso
+    const [sucessoCadastro, setSucessoCadastro] = useState(false);
 
     const brTelefonePattern = /^\(?\d{2}\)?[\s-]?[\s9]?\d{4}-?\d{4}$/;
     const senhaPattern = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,16}$/;
@@ -18,7 +30,6 @@ export function Cadastro() {
 
     const onSubmit = async (data) => {
         try {
-            // CORREÇÃO: Rota ajustada para /pacientes/cadastro
             const response = await fetch('http://localhost:3001/pacientes/cadastro', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -33,12 +44,16 @@ export function Cadastro() {
             const responseData = await response.json();
 
             if (!response.ok) {
-                // Se der erro (ex: email duplicado), lança erro para o catch
                 throw new Error(responseData.erro || "Erro ao cadastrar");
             }
 
-            alert("Cadastro realizado com sucesso!");
-            navigate("/login"); // Manda o usuário para a tela de login
+            // Ativa o pop-up de sucesso
+            setSucessoCadastro(true);
+
+            // Aguarda 3 segundos para leitura e redireciona para o login
+            setTimeout(() => {
+                navigate("/login");
+            }, 3000);
 
         } catch (error) {
             // Tratamento de erros vindos do backend
@@ -54,6 +69,18 @@ export function Cadastro() {
         <div className="login-container">
             <TelaBase>
                 <Header />
+
+                {/* --- POP-UP DE SUCESSO --- */}
+                {sucessoCadastro && (
+                    <OverlayContainer>
+                        <OverlayContent>
+                            <OverlayIcon src="/assets/images/imgaalerta.svg" alt="Sucesso" />
+                            <OverlayTitle>Usuário cadastrado com sucesso</OverlayTitle>
+                            {/* Sem botões, redirecionamento automático */}
+                        </OverlayContent>
+                    </OverlayContainer>
+                )}
+
                 <Title>Cadastre-se</Title>
                 <FormContainer onSubmit={handleSubmit(onSubmit)}>
 

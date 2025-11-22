@@ -147,3 +147,9 @@ export const DeleteButton = styled.button`
     color: #6c757d;
   }
 `;
+
+export const Alinha = styled.div`
+  width: 80%;            
+  margin: 0 auto;        
+  text-align: center;   
+`;
