@@ -31,19 +31,8 @@ export function RecuperacaoSenha() {
               throw new Error(responseData.erro || "Erro ao enviar e-mail");
           }
 
-          // 🚀 MÁGICA AQUI: Se tiver link de preview (Ethereal), mostramos pro usuário
-          if (responseData.previewUrl) {
-             // Copia para o clipboard para facilitar
-             await navigator.clipboard.writeText(responseData.previewUrl);
-             
-             // Abre em nova aba se o navegador permitir
-             window.open(responseData.previewUrl, "_blank");
-
-             alert(`Sucesso! (MODO TESTE)\n\nO link do e-mail foi copiado para sua área de transferência e tentamos abri-lo.\n\nCaso não abra, cole no navegador:\n${responseData.previewUrl}`);
-          } else {
-             alert("Sucesso! Uma nova senha provisória foi enviada para o seu e-mail.");
-          }
-          
+          // Mensagem simples de sucesso
+          alert("Sucesso! Uma nova senha foi enviada para o seu e-mail. Verifique sua caixa de entrada (e spam).");
           navigate("/login");
 
       } catch (error) {
@@ -57,9 +46,8 @@ export function RecuperacaoSenha() {
             <Header />
             <Title>Recupere sua senha</Title>
             <FormContainer onSubmit={handleSubmit(onSubmit)}>
-                <p style={{textAlign: "center", fontSize: "14px", color: "#666", marginBottom: "20px"}}>
-                    (Modo Desenvolvimento: O e-mail abrirá na sua tela)
-                    <br/>Informe seu e-mail cadastrado.
+                <p>
+                    Informe seu e-mail cadastrado para receber uma nova senha provisória.
                 </p>
 
                 <Label htmlFor="email">Email</Label>
@@ -77,7 +65,7 @@ export function RecuperacaoSenha() {
                 {errors.email && <ErrorMessage>{errors.email.message}</ErrorMessage>}
 
                 <MyButton disabled={isSubmitting} type="submit">
-                    {isSubmitting ? "Gerando nova senha..." : "Receber Nova Senha"}
+                    {isSubmitting ? "Enviando..." : "Receber Nova Senha"}
                 </MyButton>
 
                 <MyButton type="button" onClick={handleClickLogin}>Voltar</MyButton>
