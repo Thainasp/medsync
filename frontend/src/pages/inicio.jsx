@@ -5,6 +5,8 @@ import { Header } from "../components/header";
 import { Menu } from "../components/menu";
 import { Calendar } from "src/components/calendar";
 import { Medication } from "src/components/medication";
+import { ModalAddMedicamento } from "./../components/ModalAddMedicamento";
+
 
 const PageContainer = styled.div`
   display: flex;
@@ -14,7 +16,7 @@ const PageContainer = styled.div`
 const ContentContainer = styled.div`
   flex: 1;
   padding: 5% 15%;
-`;  
+`;
 
 const WrapperCalendar = styled.section`
   padding: 5px;
@@ -92,88 +94,90 @@ const SetaImage = styled.img`
 `;
 
 export function Inicio() {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-    
-    const menuItems = [
-        "Calendário",
-        "Minhas receitas e medicamentos", 
-        "Perfil",
-        "Estoque",
-        "Configurações"
-    ];
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-    const medications = [
-        {
-            name: "Losartana",
-            time: "20:00",
-            note: "Tomar antes do jantar"
-        },
-        {
-            name: "Ansitec",
-            time: "09:00",
-            note: ""
-        },
-        {
-            name: "Pantoprazol",
-            time: "09:00",
-            note: "Tomar em jejum"
-        },
-        {
-            name: "Sinvastatina",
-            time: "22:00",
-            note: "Tomar antes de dormir"
-        }
-    ];
+  const menuItems = [
+    "Calendário",
+    "Minhas receitas e medicamentos",
+    "Perfil",
+    "Estoque",
+    "Configurações"
+  ];
 
-    const handleMenuToggle = () => {
-        setIsMenuOpen(!isMenuOpen);
-    };
 
-    const handleMenuClose = () => {
-        setIsMenuOpen(false);
-    };
 
-    return (
-      <PageContainer className="inicio-container">
-        <Header 
-          variant="alt" 
-          text="Nome do Usuário" 
-          onMenuClick={handleMenuToggle}
-        />     
-        
-        <Menu 
-          isOpen={isMenuOpen}
-          onClose={handleMenuClose}
-          menuItems={menuItems}
-        />
-        
-        <ContentContainer>
-          <Calendar variant="header-only" />
-          <SectionTitle>Medicamentos diários</SectionTitle>
-          <Wrapper>
-            {medications.map((med, index) => (
-              <Medication 
-                key={index}
-                name={med.name}
-                time={med.time}
-                note={med.note}
-              />
-            ))}
-          </Wrapper>
-          <Button>Nova receita +</Button>
-          <SectionTitle>Nesta semana:</SectionTitle>
-          <WrapperCalendar>
-            <Calendar variant="week-only" />
-          </WrapperCalendar>
-          <LinkContainer>
-            <MyLink href="/calendario">Acessar o calendário completo </MyLink>
-            <SetaImage 
-                src="./assets/images/seta.png" 
-                alt="Seta" 
-              />
-          </LinkContainer>
-        </ContentContainer>
-        <Footer/>
-      </PageContainer>
-    );
+  const medications = [
+    {
+      name: "Losartana",
+      time: "20:00",
+      note: "Tomar antes do jantar"
+    },
+    {
+      name: "Ansitec",
+      time: "09:00",
+      note: ""
+    },
+    {
+      name: "Pantoprazol",
+      time: "09:00",
+      note: "Tomar em jejum"
+    },
+    {
+      name: "Sinvastatina",
+      time: "22:00",
+      note: "Tomar antes de dormir"
+    }
+  ];
+
+  const handleMenuToggle = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleMenuClose = () => {
+    setIsMenuOpen(false);
+  };
+
+  return (
+    <PageContainer className="inicio-container">
+      <Header
+        variant="alt"
+        text="Nome do Usuário"
+        onMenuClick={handleMenuToggle}
+      />
+
+      <Menu
+        isOpen={isMenuOpen}
+        onClose={handleMenuClose}
+        menuItems={menuItems}
+      />
+
+      <ContentContainer>
+        <Calendar variant="header-only" />
+        <SectionTitle>Medicamentos diários</SectionTitle>
+        <Wrapper>
+          {medications.map((med, index) => (
+            <Medication
+              key={index}
+              name={med.name}
+              time={med.time}
+              note={med.note}
+            />
+          ))}
+        </Wrapper>
+        <Button>Nova receita +</Button>
+        <SectionTitle>Nesta semana:</SectionTitle>
+        <WrapperCalendar>
+          <Calendar variant="week-only" />
+        </WrapperCalendar>
+        <LinkContainer>
+          <MyLink href="/calendario">Acessar o calendário completo </MyLink>
+          <SetaImage
+            src="./assets/images/seta.png"
+            alt="Seta"
+          />
+        </LinkContainer>
+      </ContentContainer>
+      <Footer />
+    </PageContainer>
+  );
 }

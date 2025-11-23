@@ -39,7 +39,7 @@ db.serialize(() => {
     -- Tenta adicionar as novas colunas
     ALTER TABLE Receita ADD COLUMN data_vencimento DATE;
 `, (err) => {
-    if (err && !err.message.includes("Coluna duplicada")) {
+    if (err && !/duplicate column/i.test(err.message)) {
       console.error("Erro ao adicionar coluna data_vencimento:", err.message);
     }
   });
@@ -47,7 +47,7 @@ db.serialize(() => {
   db.run(`
     ALTER TABLE Receita ADD COLUMN alerta_vencimento BOOLEAN; 
 `, (err) => {
-    if (err && !err.message.includes("Coluna duplicada")) {
+    if (err && !/duplicate column/i.test(err.message)) {
       console.error("Erro ao adicionar coluna alerta_vencimento:", err.message);
     }
   });
@@ -55,7 +55,7 @@ db.serialize(() => {
   db.run(`
     ALTER TABLE Receita ADD COLUMN notificacao_med BOOLEAN;
 `, (err) => {
-    if (err && !err.message.includes("Coluna duplicada")) {
+    if (err && !/duplicate column/i.test(err.message)) {
       console.error("Erro ao adicionar coluna notificacao_med:", err.message);
     }
   });
@@ -64,7 +64,11 @@ db.serialize(() => {
     CREATE TABLE IF NOT EXISTS Medicamento (
       idMedicamento INTEGER PRIMARY KEY AUTOINCREMENT,
       nome TEXT NOT NULL,
-      dosagem REAL NOT NULL
+      dosagem REAL NOT NULL,
+      idPaciente INTEGER NOT NULL, 
+      FOREIGN KEY (idPaciente)
+        REFERENCES Paciente (idPaciente)
+        ON DELETE CASCADE
     );
   `);
 
@@ -103,8 +107,7 @@ db.serialize(() => {
       Medicamento_idMedicamento INTEGER NOT NULL,
       FOREIGN KEY (Medicamento_idMedicamento)
         REFERENCES Medicamento (idMedicamento)
-        ON DELETE NO ACTION
-        ON UPDATE NO ACTION
+        ON DELETE CASCADE
     );
   `);
 

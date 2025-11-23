@@ -103,26 +103,31 @@ exports.criarReceita = async (req, res) => {
     // 3. ITERAR E INSERIR AS PRESCRIÇÕES (Itens da Receita)
     for (const med of medicamentosReceita) {
 
-      // 3a. Busca ou Insere o Medicamento no Catálogo
-      const medRow = await dbAsync.get("SELECT idMedicamento FROM Medicamento WHERE nome = ?", [med.nome]);
+      // 3a. Busca ou Insere o Medicamento no Catálogo (associado ao paciente)
+      const medRow = await dbAsync.get(
+        "SELECT idMedicamento FROM Medicamento WHERE nome = ? AND idPaciente = ?",
+        [med.nome, Paciente_idPaciente]
+      );
 
       let idMedicamento;
       if (medRow) {
         idMedicamento = medRow.idMedicamento;
       } else {
         const novoMedResult = await dbAsync.run(
-          "INSERT INTO Medicamento (nome, dosagem) VALUES (?, ?)",
-          [med.nome, med.dosagem]
+          "INSERT INTO Medicamento (nome, dosagem, idPaciente) VALUES (?, ?, ?)",
+          [med.nome, med.dosagem, Paciente_idPaciente]
         );
         idMedicamento = novoMedResult.lastID;
       }
       // 3b. Inserir na tabela Prescricao
+      // Normaliza quantidade (aceita `qtdUso` ou `quantidade`) e converte números
+      const qtdUsoVal = med.qtdUso !== undefined ? med.qtdUso : med.quantidade;
       await dbAsync.run(`
                 INSERT INTO Prescricao (
                     frequencia, quantidade, observacoes, Medicamento_idMedicamento, Receita_idReceita
                 ) VALUES (?, ?, ?, ?, ?)`, [
-        med.frequencia,
-        med.qtdUso,
+        Number(med.frequencia),
+        Number(qtdUsoVal),
         med.observacoesItem || null,
         idMedicamento,
         idReceitaCriada
