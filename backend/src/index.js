@@ -13,8 +13,6 @@ const tratamentoRoutes = require("./routes/tratamentoRoutes");
 const estoqueRoutes = require("./routes/estoqueRoutes");
 const thpRoutes = require("./routes/tratamentoHasPrescricaoRoutes");
 
-
-
 app.get('/', (req, res) => {
   res.send('O servidor Backend está funcionando!');
 });

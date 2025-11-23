@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { data, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import styled, { css } from "styled-components";
 
 import { QuadroFundo } from "../components/quadroFundo";
@@ -162,39 +162,59 @@ const AddReceita = ({ isEdit = false, receita = {} }) => {
       return;
     }
     // Se válido, prepara os dados e salva
-    const formData = {
-      nomeReceita,
-      Paciente_idPaciente: 1, // pessoa responsavel pelo paciente add id
-      dataReceita,
-      observacoes,
-      medicamentosReceita,
-      alertaVencimento,
-      notificacaoMed,
-    };
+      // Converte data ISO (YYYY-MM-DD) do input `type="date"` para DD/MM/YYYY esperado pelo backend
+      const isoToBR = (iso) => {
+        if (!iso) return iso;
+        const parts = iso.split('-');
+        if (parts.length !== 3) return iso;
+        const [y, m, d] = parts;
+        return `${d}/${m}/${y}`;
+      };
+
+      const formData = {
+        nomeReceita,
+        Paciente_idPaciente: 1, // pessoa responsavel pelo paciente add id
+        dataReceita: isoToBR(dataReceita),
+        observacoes,
+        medicamentosReceita,
+        alertaVencimento,
+        notificacaoMed,
+      };
 
     try {
+      // Salva todos os medicamentos primeiro (em paralelo) e obtém os ids retornados
       const medicamentosComId = [];
       if (medicamentosReceita.length > 0) {
-        medicamentosReceita.forEach(async (med) => {
-          const medBanco = await salvarMedicamento(med);
-          const medComId = { ...med, idMedicamento: medBanco.id };
-          medicamentosComId.push(medComId);
+        const savedMedicamentos = await Promise.all(
+          medicamentosReceita.map((med) => salvarMedicamento(med))
+        );
+        // Mapear resultados para o formato esperado
+        savedMedicamentos.forEach((medBanco, idx) => {
+          const original = medicamentosReceita[idx];
+          const idMedicamento = medBanco.id || medBanco.idMedicamento || medBanco.ID || medBanco.id_med;
+          medicamentosComId.push({ ...original, idMedicamento });
         });
       }
 
       const receita = await salvarReceita(formData);
+      const receitaId = receita.idReceita || receita.id || receita.ID || receita.id_receita;
 
-      medicamentosComId.forEach(async (med) => {
-        const prescricaoData = {
-          Receita_idReceita: receita.id,
-          Medicamento_idMedicamento: med.idMedicamento,
-          frequencia: med.frequencia,
-          quantidade: med.quantidade,
-          data_inicio: med.data_inicio,
-        };
-        console.log(prescricaoData);
-        await salvarPrescricao(prescricaoData);
-      });
+      // Cria prescrições para cada medicamento salvo (em paralelo)
+      if (medicamentosComId.length > 0) {
+        await Promise.all(
+          medicamentosComId.map((med) => {
+            const prescricaoData = {
+              Receita_idReceita: receitaId,
+              Medicamento_idMedicamento: med.idMedicamento || med.id || med.idMedicamento,
+              frequencia: med.frequencia,
+              quantidade: med.qtdUso || med.quantidade,
+              data_inicio: med.data_inicio,
+            };
+            console.log(prescricaoData);
+            return salvarPrescricao(prescricaoData);
+          })
+        );
+      }
 
       console.log("Receita salva com sucesso!", formData);
       /* setSucessoEnviado(true);
@@ -204,7 +224,8 @@ const AddReceita = ({ isEdit = false, receita = {} }) => {
       }, 3000); */
     } catch (error) {
       console.error("Erro ao salvar a receita:", error);
-      alert("Erro ao salvar a receita. Tente novamente.");
+      // Se o backend retornou uma mensagem, exibe-a ao usuário
+      alert(error && error.message ? `Falha ao salvar receita: ${error.message}` : "Erro ao salvar a receita. Tente novamente.");
     } finally {
       setIsSubmitting(false);
     }
