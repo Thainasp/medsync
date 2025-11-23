@@ -62,7 +62,7 @@ db.serialize(() => {
 
   db.run(`
     CREATE TABLE IF NOT EXISTS Medicamento (
-      idMedicamento INTEGER PRIMARY KEY,
+      idMedicamento INTEGER PRIMARY KEY AUTOINCREMENT,
       nome TEXT NOT NULL,
       dosagem REAL NOT NULL
     );
@@ -70,7 +70,7 @@ db.serialize(() => {
 
   db.run(`
     CREATE TABLE IF NOT EXISTS Prescricao (
-      idPrescricao INTEGER PRIMARY KEY,
+      idPrescricao INTEGER PRIMARY KEY AUTOINCREMENT,
       frequencia INTEGER NOT NULL,
       quantidade INTEGER NOT NULL,
       observacoes TEXT,
@@ -89,8 +89,7 @@ db.serialize(() => {
 
   db.run(`
     CREATE TABLE IF NOT EXISTS Tratamento (
-      idTratamento INTEGER PRIMARY KEY,
-      data_inicio DATE NOT NULL,
+      idTratamento INTEGER PRIMARY KEY AUTOINCREMENT,
       periodo INTEGER NOT NULL,
       consumido INTEGER
     );
@@ -98,7 +97,7 @@ db.serialize(() => {
 
   db.run(`
     CREATE TABLE IF NOT EXISTS Estoque (
-      idEstoque INTEGER PRIMARY KEY,
+      idEstoque INTEGER PRIMARY KEY AUTOINCREMENT,
       data_compra DATE NOT NULL,
       quantidade INTEGER NOT NULL,
       Medicamento_idMedicamento INTEGER NOT NULL,

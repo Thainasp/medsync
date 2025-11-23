@@ -14,6 +14,7 @@ exports.listar = (req, res) => {
 };
 
 exports.criar = (req, res) => {
+  console.log(req.body)
   const { Tratamento_idTratamento, Prescricao_idPrescricao, horario } =
     req.body;
   db.run(
