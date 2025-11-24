@@ -98,3 +98,23 @@ exports.editarMedicamento = (req, res) => {
     }
   );
 };
+
+exports.getMedicamentosByReceitaId = (req, res) => {
+  const idReceita = req.params.idReceita;
+console.log("Buscando medicamentos para Receita ID:", idReceita);
+  db.all(
+    `SELECT m.idMedicamento, m.nome, m.dosagem, p.frequencia, p.quantidade AS qtdUso, p.observacoes AS observacoesItem
+     FROM Medicamento m
+      INNER JOIN Prescricao p ON m.idMedicamento = p.Medicamento_idMedicamento
+      WHERE p.Receita_idReceita = ?`, 
+    [idReceita],
+    (err, rows) => {
+      if (err) {
+        res.status(500).json({ erro: err.message }); 
+      } else {
+        console.log("Medicamentos encontrados:", rows);
+        res.status(200).json(rows); 
+      }
+    }
+  );
+}

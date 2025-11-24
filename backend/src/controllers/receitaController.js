@@ -169,7 +169,7 @@ exports.listarReceitas = async (req, res) => {
   const idUsuario = req.userId;
   try {
     const sql = `
-      SELECT R.idReceita, R.nomeReceita, R.data_emissao, P.nome AS nomePaciente
+      SELECT R.idReceita, R.nomeReceita, R.observacoes, R.data_emissao, P.nome AS nomePaciente
       FROM Receita R
       INNER JOIN Paciente P ON R.Paciente_idPaciente = P.idPaciente
       WHERE R.Paciente_idPaciente = ?  -- FILTRO DE SEGURANÇA

@@ -15,4 +15,5 @@ router.get("/catalogo", controller.buscarNoCatalogo);
 
 router.get("/:id", controller.getMedicamentoById);
 
+router.get("/receita/:idReceita", controller.getMedicamentosByReceitaId);
 module.exports = router;

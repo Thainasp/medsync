@@ -20,6 +20,17 @@ const salvarMedicamentoAPI = async (medicamento) => {
   return response.json();
 }
 
+const listarMedicamentosByReceitaId = async (idReceita) => {
+  const response = await fetch(`http://localhost:3001/medicamentos/receita/${idReceita}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  console.log("Resposta da API:", response);
+  return response.json();
+};
+
 export const useMedicamentoContext = () => {
   return React.useContext(MedicamentoContext);
 }
@@ -44,14 +55,24 @@ export const MedicamentoProvider = ({ children }) => {
     const novoMedicamento = await salvarMedicamentoAPI(medicamento);
     return novoMedicamento;
   };
-
-    return (   
-    <MedicamentoContext.Provider
-      value={{ medicamentos, buscaMedicamentos, medicamentosReceita, addMedicamentoReceita, salvarMedicamento }}
-    >
+  const buscarMedicamentosByReceitaId = async (idReceita) => {
+    const dados = await listarMedicamentosByReceitaId(idReceita);
+    return dados;
+  };
+    return (
+      <MedicamentoContext.Provider
+        value={{
+          medicamentos,
+          buscaMedicamentos,
+          medicamentosReceita,
+          addMedicamentoReceita,
+          salvarMedicamento,
+          buscarMedicamentosByReceitaId,
+        }}
+      >
         {children}
-    </MedicamentoContext.Provider>
-  );
+      </MedicamentoContext.Provider>
+    );
 };
 
 export default MedicamentoContext;

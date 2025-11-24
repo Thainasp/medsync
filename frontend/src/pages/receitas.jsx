@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { use, useState, useEffect} from "react";
 
 
 import { TelaBase } from "../components/telaBase";
@@ -36,37 +36,31 @@ import {
     PencilIconComponent
 } from "../components/receitaStyles"; 
 
-
-// --- MOCK ---
-const receitasMock = [
-    { 
-        id: 'r1', 
-        nome: 'Receita dra maria', 
-        data: '23/08/2025', 
-        obs: 'Receita de gripe',
-        medicamentos: [{nome: 'Paracetamol 500mg (2x ao dia)'}, {nome: 'Amoxicilina 500mg (3x ao dia)'}]
-    },
-    { 
-        id: 'r2', 
-        nome: 'Receita gastro', 
-        data: '23/08/2025', 
-        obs: 'Acompanhar por 7 dias.', 
-        medicamentos: [{nome: 'Omeprazol 20mg (1x ao dia antes do café)'}]
-    },
-    { 
-        id: 'r3', 
-        nome: 'Receita dermatológica', 
-        data: '01/09/2025', 
-        obs: 'Para alergia sazonal', 
-        medicamentos: [{nome: 'Loratadina 10mg'}, {nome: 'Creme de Hidrocortisona (uso tópico)'}]
-    },
-];
+import { useReceitaContext } from "../context/ReceitaContext";
+import { useMedicamentoContext } from "../context/MedicamentoContext";
 
 // --- Componente ItemReceita  ---
 
 const ItemReceita = ({ receita, onDelete, onEdit }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     
+    const [medicamentos, setMedicamentos] = useState([]);
+    const { buscarMedicamentosByReceitaId } = useMedicamentoContext();
+
+    const handleFetchMedicamentos = async () => {
+        const meds = await buscarMedicamentosByReceitaId(receita.idReceita);
+        console.log("Medicamentos buscados para receita ID", receita.idReceita, ":", meds);
+
+        const medsArray = Array.isArray(meds) ? meds : (meds ? [meds] : []);
+        setMedicamentos(medsArray);
+    };
+
+    useEffect(() => {
+        if (isExpanded && medicamentos.length === 0) {
+            handleFetchMedicamentos();
+        }
+    }, [isExpanded]);
+
     const handleToggleDetails = () => {
         setIsExpanded(!isExpanded);
     };
@@ -86,7 +80,10 @@ const ItemReceita = ({ receita, onDelete, onEdit }) => {
         const editMedUrl = `/editarMed?receitaId=${receita.id}&medNome=${encodeURIComponent(nomeMedicamento)}`;
         
         console.log(`[NAVIGATE] Redirecionando para: ${editMedUrl}`);
-    };
+    }; 
+    useEffect(() => {
+        console.log("Receita atual:", receita);
+    }, [receita]);
     
     return (
 
@@ -94,25 +91,25 @@ const ItemReceita = ({ receita, onDelete, onEdit }) => {
             <RecipeHeader onClick={handleToggleDetails} aria-expanded={isExpanded} role="button">
                 <RecipeDetails>
                     <RecipeTitle>
-                        {receita.nome}
+                        {receita.nomeReceita}
                         <ArrowIcon $isExpanded={isExpanded} /> 
                     </RecipeTitle>
                     <RecipeInfo>
-                        Data: {receita.data}
+                        Data: {receita.data_emissao}
                     </RecipeInfo>
                 </RecipeDetails>
                 
                 <ActionIconsContainer>
                     <EditButton 
                         onClick={handleEditClick} 
-                        aria-label={`Editar receita ${receita.nome}`}
+                        aria-label={`Editar receita ${receita.nomeReceita}`}
                     >
                         <PencilIconComponent />
                     </EditButton>
                     
                     <DeleteButton 
                         onClick={handleDeleteClick} 
-                        aria-label={`Excluir receita ${receita.nome}`}
+                        aria-label={`Excluir receita ${receita.nomeReceita}`}
                     >
                         <TrashIconComponent />
                     </DeleteButton>
@@ -122,7 +119,7 @@ const ItemReceita = ({ receita, onDelete, onEdit }) => {
             {isExpanded && (
                 <AdditionalDetails>
                     <RecipeInfo>
-                        **Observação: {receita.obs || 'Nenhuma observação'}
+                        **Observação: {receita.observacoes || 'Nenhuma observação'}
                     </RecipeInfo>
                     
                     <p style={{ fontSize: '14px', fontWeight: 'bold', margin: '10px 0 5px 0', color: '#333' }}>
@@ -130,7 +127,7 @@ const ItemReceita = ({ receita, onDelete, onEdit }) => {
                     </p>
                     
                     <MedicationList>
-                        {receita.medicamentos.map((med, index) => (
+                        {medicamentos?.map((med, index) => (
                             <MedicationItem key={index}>
                                 <MedicationContent>
                                     <span>{med.nome}</span>
@@ -153,17 +150,18 @@ const ItemReceita = ({ receita, onDelete, onEdit }) => {
 
 
 const Receitas = () => {
-    const [receitas, setReceitas] = useState(receitasMock); 
+    const { receitas } = useReceitaContext();
     const [searchTerm, setSearchTerm] = useState(''); 
     
     const [showDeletePopup, setShowDeletePopup] = useState(false);
     const [recipeToDelete, setRecipeToDelete] = useState(null); 
 
-    const filteredReceitas = receitas.filter(receita => 
+    const filteredReceitas = receitas
+     /* receitas.filter(receita => 
         receita.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
         receita.obs.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        receita.medicamentos.some(med => med.nome.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
+        receita.medicamentos.some(med => med.nome.toLowerCase().includes(searchTerm.toLowerCase())) 
+    );*/
 
     const handleDeleteReceita = (id, nome) => {
         setRecipeToDelete({ id, nome });

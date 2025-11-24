@@ -172,8 +172,6 @@ const AddReceita = ({ isEdit = false, receita = {} }) => {
       // Chama apenas UMA função. O Backend cria Receita + Medicamentos + Prescrições em transação.
       await salvarReceita(formData);
 
-      const receita = await salvarReceita(formData);
-
       console.log("Receita salva com sucesso!", formData);
       setSucessoEnviado(true);
       setTimeout(() => {
