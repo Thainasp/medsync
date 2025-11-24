@@ -1,14 +1,7 @@
-/**
- * Calcula a data de vencimento de uma receita (30 dias após a data da receita).
- * @param {string} dateString - A data inicial da receita no formato 'DD-MM-YYYY'.
- * @returns {Date} A data de validade.
- */
-
 const db = require("../db/database");
-
 const util = require('util');
 
-// Wrapper promisificado local
+// Wrapper promisificado local (Mantido da sua equipe)
 const dbAsync = {
   get: util.promisify(db.get).bind(db),
   all: util.promisify(db.all).bind(db),
@@ -16,15 +9,14 @@ const dbAsync = {
     return new Promise((resolve, reject) => {
       db.run(sql, params, function (err) {
         if (err) return reject(err);
-        // 'this' é a Statement; fornecemos lastID/changes para o chamador
         resolve({ lastID: this.lastID, changes: this.changes });
       });
     });
   }
 };
 
+// Funções Auxiliares
 function isValidBRDate(dateString) {
-  // Aceita apenas DD/MM/YYYY
   return /^\d{2}\/\d{2}\/\d{4}$/.test(dateString);
 }
 
@@ -34,7 +26,6 @@ function toISODate(dateString) {
 }
 
 function calculoVencimentoReceita(dateString) {
-  // Retorna a data de vencimento em formato ISO (YYYY-MM-DD)
   if (!isValidBRDate(dateString)) throw new Error("Data deve estar no formato DD/MM/YYYY");
   const [day, month, year] = dateString.split('/');
   const startDate = new Date(`${year}-${month.padStart(2,'0')}-${day.padStart(2,'0')}`);
@@ -45,9 +36,13 @@ function calculoVencimentoReceita(dateString) {
   return `${y}-${m}-${d}`;
 }
 
+// --- CONTROLLERS ---
+
 exports.criarReceita = async (req, res) => {
-  const { nomeReceita, dataReceita, Paciente_idPaciente, medicamentosReceita, observacoes } =
-    req.body;
+  // SEGURANÇA: Pegamos o ID do token, ignorando o que vem no body
+  const Paciente_idPaciente = req.userId; 
+  
+  const { nomeReceita, dataReceita, medicamentosReceita, observacoes } = req.body;
 
   if (!nomeReceita || !dataReceita || !medicamentosReceita || !Array.isArray(medicamentosReceita) || medicamentosReceita.length === 0) {
     return res.status(400).json({ erro: 'Campos obrigatórios ausentes ou formato inválido.' });
@@ -58,52 +53,37 @@ exports.criarReceita = async (req, res) => {
   }
   const dataEmissaoISO = toISODate(dataReceita);
 
-  const dataVencimento = calculoVencimentoReceita(dataReceita);
-
+  // Validações dos itens
   for (const med of medicamentosReceita) {
     if (!med || !med.nome) return res.status(400).json({ erro: 'Cada medicamento precisa ter o campo nome' });
-
-    // validação da dosagem: existe e é número finito
     if (med.dosagem === undefined || med.dosagem === null || !Number.isFinite(Number(med.dosagem))) {
       return res.status(400).json({ erro: `Dosagem inválida para o medicamento "${med.nome}"` });
     }
-
-    // validação da frequência: inteiro (aceita string numérica)
     if (!Number.isInteger(Number(med.frequencia))) {
       return res.status(400).json({ erro: `Frequência inválida para o medicamento "${med.nome}"` });
     }
-
-    // validação da quantidade/uso: aceita `qtdUso` ou `quantidade` (inteiro > 0)
     const qtdUsoVal = med.qtdUso !== undefined ? med.qtdUso : med.quantidade;
     if (!Number.isInteger(Number(qtdUsoVal)) || Number(qtdUsoVal) <= 0) {
       return res.status(400).json({ erro: `Quantidade de uso inválida para o medicamento "${med.nome}"` });
     }
   }
 
-  let paciente;
   try {
-    paciente = await dbAsync.get("SELECT idPaciente FROM Paciente WHERE idPaciente = ?", [Paciente_idPaciente]);
-  } catch (err) {
-    console.error("Erro ao buscar paciente:", err.message);
-    return res.status(500).json({ erro: err.message });
-  }
-  if (!paciente) return res.status(400).json({ erro: 'Paciente não encontrado' });
-
-  try {
+    // Inicia Transação
     await dbAsync.run("BEGIN TRANSACTION;");
-    // 2. INSERIR A RECEITA
+
+    // 1. INSERIR A RECEITA (Vinculada ao usuário logado)
     const receitaResult = await dbAsync.run(`
-            INSERT INTO Receita (nomeReceita, data_emissao, Paciente_idPaciente, observacoes)
-     VALUES (?, ?, ?, ?)`,
+      INSERT INTO Receita (nomeReceita, data_emissao, Paciente_idPaciente, observacoes)
+      VALUES (?, ?, ?, ?)`,
       [nomeReceita, dataEmissaoISO, Paciente_idPaciente, observacoes]
     );
 
     const idReceitaCriada = receitaResult.lastID;
 
-    // 3. ITERAR E INSERIR AS PRESCRIÇÕES (Itens da Receita)
+    // 2. ITERAR E INSERIR AS PRESCRIÇÕES
     for (const med of medicamentosReceita) {
-
-      // 3a. Busca ou Insere o Medicamento no Catálogo (associado ao paciente)
+      // Busca ou cria medicamento (privado do usuário)
       const medRow = await dbAsync.get(
         "SELECT idMedicamento FROM Medicamento WHERE nome = ? AND idPaciente = ?",
         [med.nome, Paciente_idPaciente]
@@ -119,22 +99,15 @@ exports.criarReceita = async (req, res) => {
         );
         idMedicamento = novoMedResult.lastID;
       }
-      // 3b. Inserir na tabela Prescricao
-      // Normaliza quantidade (aceita `qtdUso` ou `quantidade`) e converte números
+
       const qtdUsoVal = med.qtdUso !== undefined ? med.qtdUso : med.quantidade;
       await dbAsync.run(`
-                INSERT INTO Prescricao (
-                    frequencia, quantidade, observacoes, Medicamento_idMedicamento, Receita_idReceita
-                ) VALUES (?, ?, ?, ?, ?)`, [
-        Number(med.frequencia),
-        Number(qtdUsoVal),
-        med.observacoesItem || null,
-        idMedicamento,
-        idReceitaCriada
-      ]);
+        INSERT INTO Prescricao (frequencia, quantidade, observacoes, Medicamento_idMedicamento, Receita_idReceita) 
+        VALUES (?, ?, ?, ?, ?)`, 
+        [Number(med.frequencia), Number(qtdUsoVal), med.observacoesItem || null, idMedicamento, idReceitaCriada]
+      );
     }
 
-    // 4. COMMIT DA TRANSAÇÃO
     await dbAsync.run("COMMIT;");
     res.status(201).json({
       message: "Receita e prescrições salvas com sucesso!",
@@ -142,26 +115,23 @@ exports.criarReceita = async (req, res) => {
     });
 
   } catch (error) {
-    // ROLLBACK em caso de qualquer erro
-    await dbAsync.run("ROLLBACK;").catch(rollbackErr => console.error("Erro no ROLLBACK:", rollbackErr.message));
-    console.error("Erro durante a criação da receita (transação desfeita):", error.message);
+    await dbAsync.run("ROLLBACK;").catch(console.error);
+    console.error("Erro durante a criação da receita:", error.message);
     res.status(500).json({ erro: error.message });
   }
 };
 
 exports.atualizarReceita = async (req, res) => {
   const { id } = req.params;
+  const idUsuario = req.userId; // Segurança
   const updateData = req.body;
 
-  // Removendo campos que não atualizam o cabeçalho (e que exigem lógica separada)
-  delete updateData.Paciente_idPaciente;
+  delete updateData.Paciente_idPaciente; // Impede troca de dono
   delete updateData.medicamentosReceita;
 
   let fields = [];
   let params = [];
-  let dataVencimento;
 
-  // Construção dinâmica
   if (updateData.nomeReceita) { fields.push("nomeReceita = ?"); params.push(updateData.nomeReceita); }
   if (updateData.observacoes !== undefined) { fields.push("observacoes = ?"); params.push(updateData.observacoes); }
 
@@ -169,47 +139,42 @@ exports.atualizarReceita = async (req, res) => {
     const dataEmissaoISO = toISODate(updateData.dataReceita);
     fields.push("data_emissao = ?");
     params.push(dataEmissaoISO);
-
-    dataVencimento = calculoVencimentoReceita(updateData.dataReceita);
-    fields.push("data_vencimento = ?");
-    params.push(dataVencimento);
+    // data_vencimento removido pois não estava na estrutura original do banco enviada, 
+    // mas se existir no banco, pode manter a lógica da sua equipe.
   }
 
   if (fields.length === 0) {
-    return res.status(400).json({ erro: "Nenhum dado válido fornecido para atualização." });
+    return res.status(400).json({ erro: "Nenhum dado válido fornecido." });
   }
 
-  params.push(id); // ID para a cláusula WHERE
-
-  const sql = `UPDATE Receita SET ${fields.join(', ')} WHERE idReceita = ?`;
+  // Adiciona verificação de segurança (WHERE id AND idPaciente)
+  const sql = `UPDATE Receita SET ${fields.join(', ')} WHERE idReceita = ? AND Paciente_idPaciente = ?`;
+  params.push(id, idUsuario);
 
   try {
     const result = await dbAsync.run(sql, params);
 
     if (result.changes === 0) {
-      return res.status(404).json({ erro: "Receita não encontrada." });
+      return res.status(404).json({ erro: "Receita não encontrada ou acesso negado." });
     }
 
-    res.status(200).json({ message: "Cabeçalho da Receita atualizado com sucesso!" });
+    res.status(200).json({ message: "Receita atualizada com sucesso!" });
 
   } catch (err) {
-    console.error("Erro ao atualizar receita:", err.message);
     res.status(500).json({ erro: err.message });
   }
 };
 
-// -------------------------------------------------------------------
-// OUTRAS FUNÇÕES (Não alteradas na lógica principal, mas adaptadas para async/await)
-// -------------------------------------------------------------------
-
 exports.listarReceitas = async (req, res) => {
+  const idUsuario = req.userId;
   try {
     const sql = `
-            SELECT R.idReceita, R.nomeReceita, R.data_emissao, P.nome AS nomePaciente
-            FROM Receita R
-            INNER JOIN Paciente P ON R.Paciente_idPaciente = P.idPaciente
-        `;
-    const receitas = await dbAsync.all(sql);
+      SELECT R.idReceita, R.nomeReceita, R.data_emissao, P.nome AS nomePaciente
+      FROM Receita R
+      INNER JOIN Paciente P ON R.Paciente_idPaciente = P.idPaciente
+      WHERE R.Paciente_idPaciente = ?  -- FILTRO DE SEGURANÇA
+    `;
+    const receitas = await dbAsync.all(sql, [idUsuario]);
     res.json(receitas);
   } catch (err) {
     res.status(500).json({ erro: err.message });
@@ -218,25 +183,29 @@ exports.listarReceitas = async (req, res) => {
 
 exports.buscarReceita = async (req, res) => {
   const id = req.params.id;
+  const idUsuario = req.userId;
 
   try {
-    // 1. Busca dados do cabeçalho da Receita
-    const receita = await dbAsync.get("SELECT * FROM Receita WHERE idReceita = ?", [id]);
+    // 1. Busca cabeçalho com segurança
+    const receita = await dbAsync.get(
+      "SELECT * FROM Receita WHERE idReceita = ? AND Paciente_idPaciente = ?", 
+      [id, idUsuario]
+    );
+    
     if (!receita) {
       return res.status(404).json({ erro: "Receita não encontrada." });
     }
 
-    // 2. Busca os itens (Prescricoes) relacionados (JOIN com Medicamento para o nome/dosagem)
+    // 2. Busca itens
     const itens = await dbAsync.all(`
-            SELECT 
-                p.idPrescricao AS id, p.frequencia, p.quantidade AS qtdUso, p.observacoes AS observacoesItem, 
-                m.nome AS nomeMedicamento, m.dosagem 
-            FROM Prescricao p
-            INNER JOIN Medicamento m ON p.Medicamento_idMedicamento = m.idMedicamento
-            WHERE p.Receita_idReceita = ?
-        `, [id]);
+      SELECT 
+        p.idPrescricao AS id, p.frequencia, p.quantidade AS qtdUso, p.observacoes AS observacoesItem, 
+        m.nome AS nomeMedicamento, m.dosagem 
+      FROM Prescricao p
+      INNER JOIN Medicamento m ON p.Medicamento_idMedicamento = m.idMedicamento
+      WHERE p.Receita_idReceita = ?
+    `, [id]);
 
-    // 3. Combina e envia (Mapeando nomes para o Front-end)
     const responseData = {
       id: receita.idReceita,
       nomeReceita: receita.nomeReceita,
@@ -249,31 +218,28 @@ exports.buscarReceita = async (req, res) => {
 
   } catch (error) {
     console.error("Erro ao buscar receita:", error.message);
-    res.status(500).json({ erro: 'Erro interno ao buscar dados da receita.' });
+    res.status(500).json({ erro: 'Erro interno.' });
   }
 };
 
 exports.deletarReceita = async (req, res) => {
   const id = req.params.id;
+  const idUsuario = req.userId;
 
   try {
+    // Verifica dono antes de deletar
+    const receita = await dbAsync.get("SELECT idReceita FROM Receita WHERE idReceita = ? AND Paciente_idPaciente = ?", [id, idUsuario]);
+    if (!receita) return res.status(404).json({ erro: "Receita não encontrada." });
+
     await dbAsync.run("BEGIN TRANSACTION;");
-
-    // 1. Deleta itens relacionados na Prescricao
     await dbAsync.run("DELETE FROM Prescricao WHERE Receita_idReceita = ?", [id]);
-
-    // 2. Deleta a Receita
-    const result = await dbAsync.run("DELETE FROM Receita WHERE idReceita = ?", [id]);
-
+    await dbAsync.run("DELETE FROM Receita WHERE idReceita = ?", [id]);
     await dbAsync.run("COMMIT;");
 
-    if (result.changes === 0) {
-      return res.status(404).json({ erro: "Receita não encontrada" });
-    }
-    res.json({ mensagem: "Receita e suas prescrições deletadas com sucesso" });
+    res.json({ mensagem: "Receita deletada com sucesso" });
 
   } catch (err) {
-    await dbAsync.run("ROLLBACK;").catch(rollbackErr => console.error("Erro no ROLLBACK:", rollbackErr.message));
+    await dbAsync.run("ROLLBACK;").catch(console.error);
     res.status(500).json({ erro: err.message });
   }
 };

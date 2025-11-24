@@ -3,7 +3,6 @@ const db = require("../db/database");
 exports.listarEstoque = (req, res) => {
   const idUsuario = req.userId;
 
-  // A Mágica: Join Estoque -> Medicamento -> (Filtro idPaciente)
   const sql = `
     SELECT Estoque.*, Medicamento.nome AS nomeMedicamento
     FROM Estoque
@@ -18,8 +17,6 @@ exports.listarEstoque = (req, res) => {
 };
 
 exports.criarEstoque = (req, res) => {
-  // Mantém igual. Como o Medicamento já é privado (passo 2),
-  // você só consegue criar estoque de um remédio que é seu.
   const { data_compra, quantidade, Medicamento_idMedicamento } = req.body;
   
   db.run(
