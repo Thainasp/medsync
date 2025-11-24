@@ -156,12 +156,11 @@ const Receitas = () => {
     const [showDeletePopup, setShowDeletePopup] = useState(false);
     const [recipeToDelete, setRecipeToDelete] = useState(null); 
 
-    const filteredReceitas = receitas
-     /* receitas.filter(receita => 
-        receita.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        receita.obs.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        receita.medicamentos.some(med => med.nome.toLowerCase().includes(searchTerm.toLowerCase())) 
-    );*/
+    const filteredReceitas =
+     receitas.filter(receita => 
+        receita.nomeReceita.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        receita.observacoes.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     const handleDeleteReceita = (id, nome) => {
         setRecipeToDelete({ id, nome });
@@ -208,7 +207,7 @@ const Receitas = () => {
                 {/* Lista de Receitas */}
                 <ListaContainer>
                     {filteredReceitas.length > 0 ? (
-                        filteredReceitas.map(receita => (
+                        filteredReceitas.reverse().map(receita => (
                             <ItemReceita 
                                 key={receita.id}
                                 receita={receita}
