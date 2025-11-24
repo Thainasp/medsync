@@ -40,7 +40,8 @@ const AddReceita = ({ isEdit = false, receita = {} }) => {
   const { salvarReceita } = useReceitaContext();
   const { salvarMedicamento, medicamentosReceita } = useMedicamentoContext();
 
-  const { salvarPrescricao } = usePrescricaoETratamentoContext();
+  const { salvarPrescricao, salvarTratamento, salvarTratamentoHasPrescricao } =
+    usePrescricaoETratamentoContext();
   const navigate = useNavigate();
 
   // Dados Iniciais da Receita
@@ -185,23 +186,43 @@ const AddReceita = ({ isEdit = false, receita = {} }) => {
       const receita = await salvarReceita(formData);
 
       medicamentosComId.forEach(async (med) => {
-        const prescricaoData = {
-          Receita_idReceita: receita.id,
-          Medicamento_idMedicamento: med.idMedicamento,
-          frequencia: med.frequencia,
-          quantidade: med.quantidade,
-          data_inicio: med.data_inicio,
-        };
-        console.log(prescricaoData);
-        await salvarPrescricao(prescricaoData);
+        try {
+          const prescricaoData = {
+            Receita_idReceita: receita.id,
+            Medicamento_idMedicamento: med.idMedicamento,
+            frequencia: med.frequencia,
+            quantidade: med.quantidade,
+            data_inicio: med.data_inicio,
+          };
+          const tratamentoData = {
+            data_inicio: med.data_inicio,
+            consumido: med.consumido,
+            periodo: med.periodo,
+          };
+          const prescricaoId = await salvarPrescricao(prescricaoData);
+          const tratamentoId = await salvarTratamento(tratamentoData);
+
+          const tratamentoHasPrescricaoData = {
+            Tratamento_idTratamento: tratamentoId.id,
+            Prescricao_idPrescricao: prescricaoId.id,
+            horario: med.horario,
+          };
+
+          await salvarTratamentoHasPrescricao(tratamentoHasPrescricaoData);
+        } catch (error) {
+          console.error("Erro ao salvar prescrição/tratamento/vínculo:", error);
+          alert(
+            "Erro ao salvar prescrição/tratamento/vínculo. Tente novamente."
+          );
+        }
       });
 
       console.log("Receita salva com sucesso!", formData);
-      /* setSucessoEnviado(true);
+      setSucessoEnviado(true);
       setTimeout(() => {
         setSucessoEnviado(false);
         navigate("/receitas");
-      }, 3000); */
+      }, 3000);
     } catch (error) {
       console.error("Erro ao salvar a receita:", error);
       alert("Erro ao salvar a receita. Tente novamente.");
