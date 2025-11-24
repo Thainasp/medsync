@@ -31,9 +31,10 @@ import {
 
 import { ModalAddMedicamento } from "../components/ModalAddMedicamento";
 import { useReceitaContext } from "../context/ReceitaContext";
+import { useMedicamentoContext } from "../context/MedicamentoContext";
+import { usePrescricaoETratamentoContext } from "../context/PrescricaoETratamentoContext";
 
 const AddReceita = ({ isEdit = false, receita = {} }) => {
-  // Simplificamos: só precisamos do contexto de Receita
   const { salvarReceita } = useReceitaContext();
   const { salvarMedicamento, medicamentosReceita } = useMedicamentoContext();
 
@@ -172,38 +173,6 @@ const AddReceita = ({ isEdit = false, receita = {} }) => {
       await salvarReceita(formData);
 
       const receita = await salvarReceita(formData);
-
-      medicamentosComId.forEach(async (med) => {
-        try {
-          const prescricaoData = {
-            Receita_idReceita: receita.id,
-            Medicamento_idMedicamento: med.idMedicamento,
-            frequencia: med.frequencia,
-            quantidade: med.quantidade,
-            data_inicio: med.data_inicio,
-          };
-          const tratamentoData = {
-            data_inicio: med.data_inicio,
-            consumido: med.consumido,
-            periodo: med.periodo,
-          };
-          const prescricaoId = await salvarPrescricao(prescricaoData);
-          const tratamentoId = await salvarTratamento(tratamentoData);
-
-          const tratamentoHasPrescricaoData = {
-            Tratamento_idTratamento: tratamentoId.id,
-            Prescricao_idPrescricao: prescricaoId.id,
-            horario: med.horario,
-          };
-
-          await salvarTratamentoHasPrescricao(tratamentoHasPrescricaoData);
-        } catch (error) {
-          console.error("Erro ao salvar prescrição/tratamento/vínculo:", error);
-          alert(
-            "Erro ao salvar prescrição/tratamento/vínculo. Tente novamente."
-          );
-        }
-      });
 
       console.log("Receita salva com sucesso!", formData);
       setSucessoEnviado(true);
