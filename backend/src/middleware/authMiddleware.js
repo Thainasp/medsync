@@ -1,26 +1,24 @@
 const jwt = require("jsonwebtoken");
-const SECRET_KEY = "chave_super_secreta_do_medsync"; // Tem que ser IGUAL a do pacienteController
+const SECRET_KEY = "chave_super_secreta_do_medsync";
 
 module.exports = (req, res, next) => {
-    const token = req.headers["authorization"];
-
-    if (!token) {
+    const authHeader = req.headers["authorization"];
+    
+    // Verifica se o token existe
+    if (!authHeader) {
         return res.status(403).json({ erro: "Nenhum token fornecido." });
     }
 
-    // O token geralmente vem como "Bearer eyJhbG..."
-    // Vamos remover o "Bearer " se ele existir, ou pegar direto
-    const tokenPuro = token.startsWith("Bearer ") ? token.slice(7, token.length) : token;
+    // Remove o "Bearer " se existir
+    const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : authHeader;
 
-    jwt.verify(tokenPuro, SECRET_KEY, (err, decoded) => {
+    jwt.verify(token, SECRET_KEY, (err, decoded) => {
         if (err) {
             return res.status(401).json({ erro: "Falha na autenticação do token." });
         }
 
-        // A MÁGICA ACONTECE AQUI:
-        // Salvamos o ID do usuário dentro da requisição (req)
-        req.userId = decoded.id; 
-        
-        next(); // Pode passar para o controller
+        // Salva o ID para uso nos controllers
+        req.userId = decoded.id;
+        next();
     });
 };

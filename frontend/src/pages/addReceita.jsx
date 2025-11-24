@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { data, useNavigate } from "react-router-dom";
-import styled, { css } from "styled-components";
+import { useNavigate } from "react-router-dom";
 
 import { QuadroFundo } from "../components/quadroFundo";
 import { TextoImportante } from "../components/TextoImportante";
@@ -13,7 +12,6 @@ import {
   OverlayIcon,
   OverlayTitle,
   OverlayContent,
-  PopupButton,
   ConfirmButton,
   CancelButton,
   OverlayText,
@@ -32,11 +30,10 @@ import {
 } from "../components/addreceitastyles";
 
 import { ModalAddMedicamento } from "../components/ModalAddMedicamento";
-import { useMedicamentoContext } from "../context/MedicamentoContext";
 import { useReceitaContext } from "../context/ReceitaContext";
-import { usePrescricaoETratamentoContext } from "../context/PrescricaoETratamentoContext";
 
 const AddReceita = ({ isEdit = false, receita = {} }) => {
+  // Simplificamos: só precisamos do contexto de Receita
   const { salvarReceita } = useReceitaContext();
   const { salvarMedicamento, medicamentosReceita } = useMedicamentoContext();
 
@@ -54,26 +51,28 @@ const AddReceita = ({ isEdit = false, receita = {} }) => {
     notificacaoMed: initNotificacaoMed = false,
   } = receita;
 
-  // Estados da Receita e Inputs
+  // Estados
   const [nomeReceita, setNomeReceita] = useState(initNomeReceita);
   const [dataReceita, setDataReceita] = useState(initDataReceita);
   const [observacoes, setObservacoes] = useState(initObservacoes);
-  const [alertaVencimento, setAlertaVencimento] =
-    useState(initAlertaVencimento);
+  const [medicamentosReceitaState, setMedicamentosReceita] = useState(initMedicamentosReceita);
+  
+  const [alertaVencimento, setAlertaVencimento] = useState(initAlertaVencimento);
   const [notificacaoMed, setNotificacaoMed] = useState(initNotificacaoMed);
+  
   const [erros, setErros] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Estados de Feedback Visual
   const [sucessoEnviado, setSucessoEnviado] = useState(false);
   const [sucessoAdicionado, setSucessoAdicionado] = useState(false);
   const [sucessoRemovido, setSucessoRemovido] = useState(false);
 
   const [showDeleteMedPopup, setShowDeleteMedPopup] = useState(false);
   const [medToDelete, setMedToDelete] = useState(null);
-
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Efeito para carregar dados iniciais em modo edição
+  // Carregar dados na edição
   useEffect(() => {
     if (isEdit && Object.keys(receita).length > 0) {
       setNomeReceita(receita.nomeReceita || "");
@@ -85,8 +84,12 @@ const AddReceita = ({ isEdit = false, receita = {} }) => {
     }
   }, [isEdit, receita]);
 
+  // Adiciona medicamento na lista TEMPORÁRIA (local)
   const handleMedicamentoSalvo = (medicamentoSalvo) => {
-    const isDuplicateInRecipe = medicamentosReceita.some((med) => {
+    // Gera um ID temporário se não tiver, para controle de lista visual
+    const medComId = { ...medicamentoSalvo, id: Date.now() };
+
+    const isDuplicateInRecipe = medicamentosReceitaState.some((med) => {
       return med.nome === medicamentoSalvo.nome;
     });
     if (isDuplicateInRecipe) {
@@ -95,6 +98,8 @@ const AddReceita = ({ isEdit = false, receita = {} }) => {
       return;
     }
 
+    setMedicamentosReceita((prev) => [...prev, medComId]);
+    
     setSucessoAdicionado(true);
     setTimeout(() => setSucessoAdicionado(false), 2500);
 
@@ -102,86 +107,69 @@ const AddReceita = ({ isEdit = false, receita = {} }) => {
     return true;
   };
 
-  // Abre o pop-up de confirmação de exclusão
   const handleDeleteClick = (id) => {
-    const med = medicamentosReceita.find((m) => m.id === id);
+    const med = medicamentosReceitaState.find((m) => m.id === id);
     if (med) {
       setMedToDelete(med);
       setShowDeleteMedPopup(true);
     }
   };
 
-  // Executa a exclusão após a confirmação
   const confirmDeleteMedicamento = () => {
-    if (medToDelete && medToDelete.id) {
+    if (medToDelete) {
       setMedicamentosReceita(
-        medicamentosReceita.filter((med) => med.id !== medToDelete.id)
+        medicamentosReceitaState.filter((med) => med.id !== medToDelete.id)
       );
-
-      // Exibe o pop-up de SUCESSO de remoção
       setSucessoRemovido(true);
       setTimeout(() => setSucessoRemovido(false), 2500);
     }
-    // Fecha o pop-up
     setShowDeleteMedPopup(false);
     setMedToDelete(null);
   };
 
-  // Cancela a exclusão
   const cancelDeleteMedicamento = () => {
     setShowDeleteMedPopup(false);
     setMedToDelete(null);
   };
 
-  //  Submissão Manual e Validação ---
+  // --- SUBMISSÃO SIMPLIFICADA ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setErros({});
 
+    // Validações Básicas
     const newErros = {};
-    let isValid = true;
+    if (!nomeReceita.trim()) newErros.nomeReceita = "Nome obrigatório.";
+    if (!dataReceita) newErros.dataReceita = "Data obrigatória.";
+    if (medicamentosReceitaState.length === 0) newErros.medicamentos = "Adicione ao menos um medicamento.";
 
-    if (!nomeReceita.trim()) {
-      newErros.nomeReceita = "O nome da receita é obrigatório.";
-      isValid = false;
-    }
-
-    if (!dataReceita) {
-      newErros.dataReceita = "A data da receita é obrigatória.";
-      isValid = false;
-    }
-
-    if (medicamentosReceita.length === 0) {
-      newErros.medicamentos = "Adcione ao menos um medicamento.";
-      isValid = false;
-    }
-
-    setErros(newErros);
-
-    if (!isValid) {
+    if (Object.keys(newErros).length > 0) {
+      setErros(newErros);
       setIsSubmitting(false);
       return;
     }
-    // Se válido, prepara os dados e salva
+
+    // Converte data YYYY-MM-DD para DD/MM/YYYY
+    const isoToBR = (iso) => {
+      if (!iso) return iso;
+      const parts = iso.split('-');
+      return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : iso;
+    };
+
+    // Prepara o objeto COMPLETO para o backend
     const formData = {
       nomeReceita,
-      Paciente_idPaciente: 1, // pessoa responsavel pelo paciente add id
-      dataReceita,
+      dataReceita: isoToBR(dataReceita),
       observacoes,
-      medicamentosReceita,
+      medicamentosReceita: medicamentosReceitaState, // Manda o array todo, o backend se vira!
       alertaVencimento,
       notificacaoMed,
     };
 
     try {
-      const medicamentosComId = [];
-      if (medicamentosReceita.length > 0) {
-        medicamentosReceita.forEach(async (med) => {
-          const medBanco = await salvarMedicamento(med);
-          const medComId = { ...med, idMedicamento: medBanco.id };
-          medicamentosComId.push(medComId);
-        });
-      }
+      // Chama apenas UMA função. O Backend cria Receita + Medicamentos + Prescrições em transação.
+      await salvarReceita(formData);
 
       const receita = await salvarReceita(formData);
 
@@ -224,32 +212,23 @@ const AddReceita = ({ isEdit = false, receita = {} }) => {
         navigate("/receitas");
       }, 3000);
     } catch (error) {
-      console.error("Erro ao salvar a receita:", error);
-      alert("Erro ao salvar a receita. Tente novamente.");
+      console.error("Erro ao salvar:", error);
+      alert(error.message || "Erro ao salvar a receita. Verifique se você está logado.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Função auxiliar para formatar o nome do medicamento
   const formatarNomeMedicamento = (med) => {
     let texto = `${med.nome}`;
-    if (med.dosagem) {
-      texto += ` - ${med.dosagem}mg`;
-    }
-    if (med.frequencia) {
-      const freqOption = [
-        { value: "option", label: "--" },
-        { value: "option1", label: "De 2 em 2 horas" },
-        { value: "option2", label: "De 4 em 4 horas" },
-        { value: "option3", label: "De 6 em 6 horas" },
-        { value: "option4", label: "De 8 em 8 horas" },
-        { value: "option5", label: "Uma vez ao dia" },
-        { value: "option6", label: "Uma vez na semana" },
-      ].find((o) => o.value === med.frequencia);
-      if (freqOption) {
-        texto += ` (${freqOption.label})`;
-      }
+    if (med.dosagem) texto += ` - ${med.dosagem}mg`;
+    
+    const freqMap = {
+      "1": "De 2 em 2 horas", "2": "De 4 em 4 horas", "3": "De 6 em 6 horas",
+      "4": "De 8 em 8 horas", "5": "Uma vez ao dia", "6": "Uma vez na semana"
+    };
+    if (med.frequencia && freqMap[med.frequencia]) {
+      texto += ` (${freqMap[med.frequencia]})`;
     }
     return texto;
   };
@@ -258,7 +237,7 @@ const AddReceita = ({ isEdit = false, receita = {} }) => {
     <TelaBase>
       <Header />
 
-      {/* Overlay de Sucesso (Receita Salva) */}
+      {/* Overlays de Sucesso */}
       {sucessoEnviado && (
         <OverlayContainer>
           <OverlayContent>
@@ -267,28 +246,24 @@ const AddReceita = ({ isEdit = false, receita = {} }) => {
           </OverlayContent>
         </OverlayContainer>
       )}
-
-      {/* Overlay de Sucesso (Medicamento Adicionado) */}
       {sucessoAdicionado && (
         <OverlayContainer>
           <OverlayContent>
             <OverlayIcon src="/assets/images/imgaalerta.svg" alt="Success" />
-            <OverlayTitle>Medicamento adicionado com sucesso!</OverlayTitle>
+            <OverlayTitle>Medicamento adicionado à lista!</OverlayTitle>
           </OverlayContent>
         </OverlayContainer>
       )}
-
-      {/* Overlay de Sucesso (Medicamento Removido) */}
       {sucessoRemovido && (
         <OverlayContainer>
           <OverlayContent>
             <OverlayIcon src="/assets/images/imgaalerta.svg" alt="Success" />
-            <OverlayTitle>Medicamento removido com sucesso!</OverlayTitle>
+            <OverlayTitle>Medicamento removido da lista!</OverlayTitle>
           </OverlayContent>
         </OverlayContainer>
       )}
 
-      {/* MODAL DE ADICIONAR MEDICAMENTO */}
+      {/* Modal de Adicionar Medicamento */}
       {isModalOpen && (
         <ModalAddMedicamento
           onClose={() => setIsModalOpen(false)}
@@ -297,89 +272,64 @@ const AddReceita = ({ isEdit = false, receita = {} }) => {
       )}
 
       <QuadroFundo>
-        <TextoImportante>
-          {isEdit ? "Editar Receita" : "Nova Receita"}
-        </TextoImportante>
+        <TextoImportante>{isEdit ? "Editar Receita" : "Nova Receita"}</TextoImportante>
 
         <ReceitaFormContainer onSubmit={handleSubmit}>
-          {/* Nome da Receita (Obrigatório) */}
           <FormGroup>
             <Label htmlFor="nome-receita">Nome da Receita:</Label>
             <ReceitaInputField
               type="text"
               id="nome-receita"
-              name="nome-receita"
-              placeholder="Insira o nome da receita"
               value={nomeReceita}
               onChange={(e) => {
                 setNomeReceita(e.target.value);
-                setErros((prev) => ({ ...prev, nomeReceita: "" }));
+                setErros((p) => ({ ...p, nomeReceita: "" }));
               }}
+              placeholder="Ex: Receita Dr. Silva"
             />
-            {erros.nomeReceita && (
-              <ErrorMessage>{erros.nomeReceita}</ErrorMessage>
-            )}
+            {erros.nomeReceita && <ErrorMessage>{erros.nomeReceita}</ErrorMessage>}
           </FormGroup>
 
-          {/* Data da Receita (Obrigatório) */}
           <FormGroup>
             <Label htmlFor="data-receita">Data da Receita:</Label>
             <ReceitaInputField
               type="date"
               id="data-receita"
-              name="data-receita"
-              placeholder="Insira a data da receita"
               value={dataReceita}
               onChange={(e) => {
                 setDataReceita(e.target.value);
-                setErros((prev) => ({ ...prev, dataReceita: "" }));
+                setErros((p) => ({ ...p, dataReceita: "" }));
               }}
             />
-            {erros.dataReceita && (
-              <ErrorMessage>{erros.dataReceita}</ErrorMessage>
-            )}
+            {erros.dataReceita && <ErrorMessage>{erros.dataReceita}</ErrorMessage>}
           </FormGroup>
 
-          {/* Observações */}
           <FormGroup>
             <Label htmlFor="observacoes">Observações:</Label>
             <TextAreaField
               id="observacoes"
-              name="observacoes"
-              placeholder="Insira observações (opcional)"
               value={observacoes}
               onChange={(e) => setObservacoes(e.target.value)}
+              placeholder="Ex: Tomar após as refeições..."
             />
           </FormGroup>
 
           <Legend style={{ marginTop: "20px" }}>Medicamentos na Receita</Legend>
-
-          <MyButton
-            type="button"
-            onClick={() => setIsModalOpen(true)}
-            style={{ marginBottom: "15px" }}
-          >
+          
+          <MyButton type="button" onClick={() => setIsModalOpen(true)} style={{ marginBottom: "15px" }}>
             Adicionar Medicamento
           </MyButton>
 
-          {/* Exibição do erro de medicamentos (Obrigatório) */}
           {erros.medicamentos && (
-            <ErrorMessage style={{ marginBottom: "15px" }}>
-              {erros.medicamentos}
-            </ErrorMessage>
+            <ErrorMessage style={{ marginBottom: "15px" }}>{erros.medicamentos}</ErrorMessage>
           )}
 
-          {/* Lista de Medicamentos Adicionados */}
-          {medicamentosReceita.length > 0 && (
+          {medicamentosReceitaState.length > 0 && (
             <ListaMedicamentos>
-              {medicamentosReceita.map((med) => (
+              {medicamentosReceitaState.map((med) => (
                 <ItemMedicamento key={med.id}>
-                  • {formatarNomeMedicamento(med)}
-                  <DeleteButton
-                    type="button"
-                    onClick={() => handleDeleteClick(med.id)}
-                    aria-label={`Remover ${med.nome}`}
-                  >
+                  <span>• {formatarNomeMedicamento(med)}</span>
+                  <DeleteButton type="button" onClick={() => handleDeleteClick(med.id)}>
                     <TrashIconComponent />
                   </DeleteButton>
                 </ItemMedicamento>
@@ -387,17 +337,15 @@ const AddReceita = ({ isEdit = false, receita = {} }) => {
             </ListaMedicamentos>
           )}
 
-          {/* Checkboxes de Alerta */}
           <FormGroup>
             <CheckboxLabelGroup htmlFor="alerta-vencimento">
               <input
                 type="checkbox"
                 id="alerta-vencimento"
-                name="alerta-vencimento"
                 checked={alertaVencimento}
                 onChange={(e) => setAlertaVencimento(e.target.checked)}
               />
-              Deseja receber alerta de vencimento de receita?
+              Alertar vencimento da receita (30 dias)?
             </CheckboxLabelGroup>
           </FormGroup>
 
@@ -406,41 +354,28 @@ const AddReceita = ({ isEdit = false, receita = {} }) => {
               <input
                 type="checkbox"
                 id="notificacaoMedicamento"
-                name="notificacaoMedicamento"
                 checked={notificacaoMed}
                 onChange={(e) => setNotificacaoMed(e.target.checked)}
               />
-              Receber alerta de tomada dos medicamentos dessa receita?
+              Receber alertas de tomada para estes medicamentos?
             </CheckboxLabelGroup>
           </FormGroup>
 
-          {/* Botão de Submissão */}
-          <MyButton
-            type="submit"
-            disabled={isSubmitting}
-            style={{ marginTop: "20px" }}
-          >
+          <MyButton type="submit" disabled={isSubmitting} style={{ marginTop: "20px" }}>
             {isSubmitting ? "Salvando..." : "Salvar Receita"}
           </MyButton>
         </ReceitaFormContainer>
       </QuadroFundo>
 
-      {/* POP-UP DE CONFIRMAÇÃO DE EXCLUSÃO DE MEDICAMENTO */}
+      {/* Pop-up de Confirmação */}
       {showDeleteMedPopup && medToDelete && (
         <OverlayContainer>
           <OverlayContent>
-            <OverlayTitle>Confirmação de Exclusão</OverlayTitle>
-            <OverlayText>
-              Tem certeza que deseja remover o medicamento **"{medToDelete.nome}
-              "** da receita?
-            </OverlayText>
-            <div>
-              <ConfirmButton onClick={confirmDeleteMedicamento}>
-                Excluir
-              </ConfirmButton>
-              <CancelButton onClick={cancelDeleteMedicamento}>
-                Cancelar
-              </CancelButton>
+            <OverlayTitle>Excluir Medicamento</OverlayTitle>
+            <OverlayText>Remover "{medToDelete.nome}" desta lista?</OverlayText>
+            <div style={{display: 'flex', gap: '10px', justifyContent: 'center', marginTop: '20px'}}>
+              <ConfirmButton onClick={confirmDeleteMedicamento}>Sim, Excluir</ConfirmButton>
+              <CancelButton onClick={cancelDeleteMedicamento}>Cancelar</CancelButton>
             </div>
           </OverlayContent>
         </OverlayContainer>

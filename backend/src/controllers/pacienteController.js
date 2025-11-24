@@ -121,7 +121,7 @@ exports.deletarPaciente = (req, res) => {
   });
 };
 
-// 🔹 Recuperação de Senha (COM DADOS REAIS DO MEDSYNC)
+// 🔹 Recuperação de Senha (COM DADOS REAIS DO MEDSYNC E LAYOUT PERSONALIZADO)
 exports.recuperarSenha = (req, res) => {
   const { email } = req.body;
 
@@ -158,6 +158,7 @@ exports.recuperarSenha = (req, res) => {
           }
         });
 
+        // 6. Template de E-mail atualizado
         const mailOptions = {
           from: 'MedSync <medsync24@gmail.com>',
           to: email, // Vai para o e-mail do usuário que solicitou
@@ -180,7 +181,7 @@ exports.recuperarSenha = (req, res) => {
           `
         };
 
-        // 6. Envia o e-mail
+        // 7. Envia o e-mail
         transporter.sendMail(mailOptions, (error, info) => {
           if (error) {
             console.log("Erro ao enviar e-mail:", error);

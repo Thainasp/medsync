@@ -1,4 +1,3 @@
-// backend/src/data/medicines.js
 
 module.exports = [
   {

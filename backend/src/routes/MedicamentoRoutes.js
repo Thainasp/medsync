@@ -3,9 +3,16 @@ const router = express.Router();
 const controller = require("../controllers/medicamentoController");
 const authMiddleware = require("../middleware/authMiddleware");
 
-router.get("/", authMiddleware, controller.listarMedicamentos);
-router.post("/criar", authMiddleware, controller.criarMedicamento);
-router.put("/editar", authMiddleware, controller.editarMedicamento);
-router.get("/:id", authMiddleware, controller.getMedicamentoById);
+// Aplica segurança em todas as rotas
+router.use(authMiddleware);
+
+router.get("/", controller.listarMedicamentos);
+router.post("/criar", controller.criarMedicamento);
+router.put("/editar", controller.editarMedicamento);
+
+// 🔹 ROTA NOVA (Tem que vir antes de /:id)
+router.get("/catalogo", controller.buscarNoCatalogo);
+
+router.get("/:id", controller.getMedicamentoById);
 
 module.exports = router;
