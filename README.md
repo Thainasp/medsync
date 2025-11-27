@@ -6,6 +6,13 @@ O **MedSync** é um sistema de gerenciamento de saúde desenvolvido para auxilia
 
 O projeto foi desenvolvido por alunos do curso de **Tecnologia em Análise e Desenvolvimento de Sistemas** do Instituto Federal de São Paulo (**IFSP**), Câmpus Bragança Paulista, como avaliação parcial da disciplina de Análise Orientada a Objetos [4].
 
+## instruções de instalação da aplicação
+Para instalar e executar o projeto, primeiro faça o download do código e abra a pasta principal. O backend, que utiliza Node.js e SQLite, está localizado dentro da pasta “backend”. Entre nela e instale as dependências usando o comando npm install. Depois disso, basta iniciar o servidor com npm run start, e ele ficará disponível normalmente em http://localhost:3001.
+
+Em seguida, para configurar o frontend desenvolvido em React, acesse a pasta “frontend” e instale também as dependências com npm install. Após essa etapa, execute npm run dev para iniciar a aplicação, que abrirá em http://localhost:3000.
+
+Com isso, o backend e o frontend estarão funcionando em conjunto, permitindo que você acesse e utilize o sistema diretamente pelo navegador.
+
 ## 📚 Documentação Técnica
 Para uma análise aprofundada, detalhes de implementação, e o escopo completo do projeto, baixe o nosso documento oficial:
 
@@ -39,25 +46,14 @@ O projeto segue uma **abordagem de desenvolvimento ágil** e utiliza um conjunto
 | Componente | Tecnologia | Detalhes |
 | :--- | :--- | :--- |
 | **Frontend (Web)** | **JavaScript** (98.3%), **React** [16-18] | Utiliza **Vite** para *tooling* e suporta **HMR** (Hot Module Replacement) e **ESLint** [16]. |
-| **Frontend (Mobile)** | **React Native** [18] | Para desenvolvimento de aplicações móveis nativas [18]. |
-| **Backend** | **Python** com **Django Framework** [10] | Para construção de APIs RESTful [10]. |
-| **Banco de Dados** | **MySQL** [9, 10] | Sistema de gerenciamento de banco de dados relacional (RNF06) [9, 10]. |
+| **Backend** | **JavaScript** com **Node** [10] |
+| **Banco de Dados** | **SQlite** | Sistema de gerenciamento de banco de dados relacional. |
 | **APIs** | **Google Calendar API**, **API Bulário Digital** [9, 10] | Integração com agenda e verificação de interações medicamentosas [10]. |
-| **Qualidade/Testes** | **Jest** (Frontend), **Postman**, **Insomnia** (Backend) [9, 15] | Ferramentas de teste (RNF07) [9]. |
-| **Infraestrutura** | **Git** / **GitHub**, **Railway**, **Docker** [10, 15] | Controle de versão, hospedagem e conteinerização [10, 15]. |
+| **Infraestrutura** | **Git** / **GitHub**| Controle de versão e hospedagem |
 
 ## 🚀 Começando (Setup Técnico)
 
 Este repositório (`Thainasp/medsync`) reflete a configuração inicial de um *template* que fornece o setup mínimo para o React funcionar no Vite [16].
-
-### Plugins Oficiais para Fast Refresh:
-
-*   `@vitejs/plugin-react`: utiliza **Babel** para Fast Refresh [16].
-*   `@vitejs/plugin-react-swc`: utiliza **SWC** para Fast Refresh [16].
-
-### Recomendação de Desenvolvimento:
-
-Se o desenvolvimento for para uma aplicação de produção, é recomendável expandir a configuração do ESLint e usar **TypeScript** com regras de *lint* habilitadas para tipos [16].
 
 ### Estrutura de Arquivos (Parcial):
 
