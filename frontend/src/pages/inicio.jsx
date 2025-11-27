@@ -6,6 +6,9 @@ import { Menu } from "../components/menu";
 import { Calendar } from "src/components/calendar";
 import { Medication } from "src/components/medication";
 import { ModalAddMedicamento } from "./../components/ModalAddMedicamento";
+import { useNavigate, Link } from "react-router-dom";
+import { MyButton } from "../components/myButton";
+import { FormContainer, Label, Title, InputField, StyledDivLinks, ErrorMessage, DeleteButton } from "../components/forms";
 
 
 const PageContainer = styled.div`
@@ -164,17 +167,18 @@ export function Inicio() {
             />
           ))}
         </Wrapper>
-        <Button>Nova receita +</Button>
+        <Link to="/addReceita" style={{ textDecoration: "none" }}>
+          <MyButton style={{ marginTop: "20px" }}>
+            Nova Receita +
+          </MyButton>
+        </Link>
         <SectionTitle>Nesta semana:</SectionTitle>
         <WrapperCalendar>
           <Calendar variant="week-only" />
         </WrapperCalendar>
         <LinkContainer>
           <MyLink href="/calendario">Acessar o calendário completo </MyLink>
-          <SetaImage
-            src="./assets/images/seta.png"
-            alt="Seta"
-          />
+          <SetaImage src="./assets/images/seta.png" alt="Seta" />
         </LinkContainer>
       </ContentContainer>
       <Footer />
