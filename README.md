@@ -6,8 +6,8 @@ O **MedSync** é um sistema de gerenciamento de saúde desenvolvido para auxilia
 
 O projeto foi desenvolvido por alunos do curso de **Tecnologia em Análise e Desenvolvimento de Sistemas** do Instituto Federal de São Paulo (**IFSP**), Câmpus Bragança Paulista, como avaliação parcial da disciplina de Análise Orientada a Objetos [4].
 
-## instruções de instalação da aplicação
-Para instalar e executar o projeto, primeiro faça o download do código e abra a pasta principal. O backend, que utiliza Node.js e SQLite, está localizado dentro da pasta “backend”. Entre nela e instale as dependências usando o comando npm install. Depois disso, basta iniciar o servidor com npm run start, e ele ficará disponível normalmente em http://localhost:3001.
+## Instruções de instalação da aplicação
+Para instalar e executar o projeto, primeiro faça o download do código e abra a pasta principal. O backend, que utiliza Node.js e SQLite, está localizado dentro da pasta “backend”. Entre nela e instale as dependências usando o comando npm install. Depois disso, basta iniciar o servidor com npm run start, e ele ficará disponível em http://localhost:3001.
 
 Em seguida, para configurar o frontend desenvolvido em React, acesse a pasta “frontend” e instale também as dependências com npm install. Após essa etapa, execute npm run dev para iniciar a aplicação, que abrirá em http://localhost:3000.
 
