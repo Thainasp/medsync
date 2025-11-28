@@ -17,6 +17,7 @@ Com isso, o backend e o frontend estarão funcionando em conjunto, permitindo qu
 Para uma análise aprofundada, detalhes de implementação, e o escopo completo do projeto, baixe o nosso documento oficial:
 
 * **[Documentação Técnica MedSync (PDF)](./Documentacao_Tecnica_Medsync.pdf)**
+*  **[Documentação Técnica Versão Final Medsync (PDF)] (./Documentacao_Tecnica_Final_Medsync.pdf).**
 
 ## 🎯 Objetivo e Funcionalidades
 
